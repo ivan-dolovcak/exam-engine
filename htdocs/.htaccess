@@ -1,0 +1,18 @@
+DirectoryIndex index.php index.html
+
+# Set default charset:
+<IfModule mod_mime.c>
+    AddDefaultCharset utf-8
+</IfModule>
+
+# Deny dirs without an index page:
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Hide secrets:
+<Files ".secrets.json">
+    Require all denied
+</Files>
+
+# TODO: add rules for URL rewriting (pretty URL's)
