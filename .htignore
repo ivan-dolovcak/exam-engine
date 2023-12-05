@@ -1,1 +1,2 @@
---exclude .secrets.template.json
+--exclude .secrets.template.json \
+--exclude local.lock

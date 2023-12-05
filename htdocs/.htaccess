@@ -1,5 +1,16 @@
 DirectoryIndex index.php index.html
 
+# Using mod_php because the hosting service doesn't allow custom php.ini files:
+<IfModule mod_php.c>
+    # If running locally, display all PHP errors:
+    <If "-f %{DOCUMENT_ROOT} . '/local.lock'">
+        php_flag display_errors on
+        php_value error_reporting -1
+    </If>
+
+    php_value auto_prepend_file common.php
+</IfModule>
+
 # Set default charset:
 <IfModule mod_mime.c>
     AddDefaultCharset utf-8
@@ -11,7 +22,7 @@ DirectoryIndex index.php index.html
 </IfModule>
 
 # Hide secrets:
-<Files ".secrets.json">
+<Files .secrets.json>
     Require all denied
 </Files>
 
