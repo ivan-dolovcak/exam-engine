@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Exam Engine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="clean_hosting.js" defer></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
