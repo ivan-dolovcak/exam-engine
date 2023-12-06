@@ -3,7 +3,7 @@ DirectoryIndex index.php index.html
 # Using mod_php because the hosting service doesn't allow custom php.ini files:
 <IfModule mod_php.c>
     # If running locally, display all PHP errors:
-    <If "-f %{DOCUMENT_ROOT} . '/local.lock'">
+    <If "-f %{DOCUMENT_ROOT} . '/.server/local.lock'">
         php_flag display_errors on
         php_value error_reporting -1
     </If>
@@ -20,10 +20,5 @@ DirectoryIndex index.php index.html
 <IfModule mod_autoindex.c>
     Options -Indexes
 </IfModule>
-
-# Hide secrets:
-<Files .secrets.json>
-    Require all denied
-</Files>
 
 # TODO: add rules for URL rewriting (pretty URL's)

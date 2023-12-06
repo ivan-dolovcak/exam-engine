@@ -1,2 +1,2 @@
---exclude .secrets.template.json \
---exclude local.lock
+--exclude .server/.auth.template.json \
+--exclude .server/local.lock

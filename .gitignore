@@ -1,2 +1,2 @@
-htdocs/.secrets.json
-htdocs/.version
+htdocs/.server/.auth.json
+htdocs/.server/.app_version

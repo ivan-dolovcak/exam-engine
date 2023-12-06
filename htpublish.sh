@@ -4,17 +4,17 @@
 
 serverRoot="/public_html"
 clientRoot="htdocs"
-secretsFile="htdocs/.secrets.json"
+authFile="$clientRoot/.server/.auth.json"
 
-hostname=$(jq .ftp.hostname $secretsFile)
-username=$(jq .ftp.username $secretsFile)
-password=$(jq .ftp.password $secretsFile)
+hostname=$(jq .ftp.hostname $authFile)
+username=$(jq .ftp.username $authFile)
+password=$(jq .ftp.password $authFile)
 
 # Write git commit/tag and date to display on website:
-version="$(git show \
+appVersion="$(git show \
 	--no-patch --format="%(describe) (%ad)" --date="format:%Y-%m-%d %H:%M")"
 
-echo "$version" > "$clientRoot/.version"
+echo "$appVersion" > "$clientRoot/.server/.app_version"
 
 lftp -c "
 	open $hostname
