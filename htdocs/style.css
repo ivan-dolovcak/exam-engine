@@ -3,3 +3,14 @@ body {
     color: ghostwhite;
     font-family: sans-serif;
 }
+
+span#version {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: yellow;
+    color: black;
+    font-family: monospace;
+    padding: 1px;
+    font-weight: bold;
+}

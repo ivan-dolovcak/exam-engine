@@ -10,6 +10,12 @@ hostname=$(jq .ftp.hostname $secretsFile)
 username=$(jq .ftp.username $secretsFile)
 password=$(jq .ftp.password $secretsFile)
 
+# Write git commit/tag and date to display on website:
+version="$(git show \
+	--no-patch --format="%(describe) (%ad)" --date="format:%Y-%m-%d %H:%M")"
+
+echo "$version" > "$clientRoot/.version"
+
 lftp -c "
 	open $hostname
 	user $username $password

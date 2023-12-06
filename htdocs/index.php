@@ -11,5 +11,15 @@
     <hr>
 
     <p>Dobro došli na početnu stranicu usluge Exam Engine!</p>
+
+<?php
+if (!file_exists(".version"))
+    return;
+
+# Show git tag+commit in bottom-right corner:
+echo '<a href="https://github.com/ivan-dolovcak/exam-engine/" target="_blank">'
+    . '<span id="version">'
+    . file_get_contents(".version") . '</span></a>';
+?>
 </body>
 </html>
