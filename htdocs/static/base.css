@@ -1,0 +1,30 @@
+:root {
+    --color-fg: 200, 200, 200;
+    --color-bg: 10, 10, 10;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: rgb(var(--color-bg));
+    color: rgb(var(--color-fg));
+    font-family: sans-serif;
+}
+
+main {
+    height: 100%;
+}
+
+mark#version {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-family: monospace;
+}
