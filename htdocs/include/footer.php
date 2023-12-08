@@ -3,7 +3,7 @@
 <?php
 # Put git tag+commit number in bottom right corner
 
-$versionFile = DOCROOT . "/.server/.app_version";
+$versionFile = $_SERVER["DOCUMENT_ROOT"] . "/.server/.app_version";
 
 if (!file_exists($versionFile))
     exit;

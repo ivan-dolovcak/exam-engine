@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <?php require_once "header.php"; setPageTitle("Početna") ?>
+    <?php require_once "head.php"; setPageTitle("Početna") ?>
 </head>
 <body>
     <header>
-        <h1>Exam Engine</h1>
-        <hr>
+        <?php require_once "header.php" ?>
     </header>
 
     <main>

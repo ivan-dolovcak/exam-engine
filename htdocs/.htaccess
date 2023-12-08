@@ -8,7 +8,7 @@ DirectoryIndex index.php index.html
         php_value error_reporting -1
     </If>
 
-    php_value auto_prepend_file common.php
+    php_value auto_prepend_file .server/common.php
 </IfModule>
 
 # Set default charset:
