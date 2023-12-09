@@ -17,6 +17,7 @@ appVersion="$(git show \
 echo "$appVersion" > "$clientRoot/.server/.app_version"
 
 lftp -c "
+    set net:reconnect-interval-base 3;
 	open $hostname
 	user $username $password
 	mirror $(cat .htignore) --continue --delete --verbose --reverse \
