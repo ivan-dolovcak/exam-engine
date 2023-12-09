@@ -1,14 +1,17 @@
 DirectoryIndex index.php index.html
 
-# Using mod_php because the hosting service doesn't allow custom php.ini files:
+# This is my workaround for getting a custom php.ini file (my hosting provider 
+# doesn't allow it):
 <IfModule mod_php.c>
-    # If running locally, display all PHP errors:
-    <If "-f %{DOCUMENT_ROOT} . '/.server/local.lock'">
-        php_flag display_errors on
-        php_value error_reporting -1
-    </If>
+    # This is the real path of the hosting service docroot, probably symlinked 
+    # to /public_html:
+    php_value auto_prepend_file \
+        /storage/ssd4/734/21605734/public_html/.server/common.php
 
-    php_value auto_prepend_file .server/common.php
+    <IfDefine DEVELOPMENT>
+        SetEnv DEVELOPMENT "true"
+        php_value auto_prepend_file /srv/http/.server/common.php
+    </IfDefine>
 </IfModule>
 
 # Set default charset:
