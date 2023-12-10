@@ -29,3 +29,7 @@ mark#version {
     right: 0;
     font-family: monospace;
 }
+
+input {
+    margin: 2px;
+}
