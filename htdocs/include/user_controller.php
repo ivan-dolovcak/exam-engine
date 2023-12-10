@@ -111,7 +111,6 @@ class User
 
     public function logout(): void
     {
-        session_start();
         unset($_SESSION);
         session_destroy();
     }
