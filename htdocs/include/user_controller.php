@@ -27,15 +27,26 @@ class User
         return $obj;
     }
 
-    public static function makeViaLogin(string $email, string $password)
+    public static function makeViaLogin(string $email)
         : self
     {
         require_once "db_controller.php";
         $obj = new self();
         $obj->email = $email;
-        $obj->passwordHash = DB::makeHash($password);
 
         return $obj;
+    }
+
+    public static function makeViaSessionVar(): ?self
+    {
+        if (session_status() != PHP_SESSION_ACTIVE)
+            session_start();
+        
+        if (isset($_SESSION["user"])) {
+            return unserialize($_SESSION["user"]);
+        }
+        else
+            return null;
     }
 
     public function register(): ?string
@@ -70,7 +81,7 @@ class User
         }
     }
 
-    public function login(): ?string
+    public function login(string $password): ?string
     {
         // SQL prep
         require_once "db_controller.php";
@@ -85,13 +96,15 @@ class User
         $sqlResult = $sqlStmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
-        if ($userRow === null)
+        if (! isset($userRow) || ! password_verify(
+            $password, $userRow["passwordHash"]))
             return "Greška: pogrešni podaci za prijavu.";
 
         // Update last login timestamp
         $sqlStmt = $sqlConn->prepare(
             DB::$sqlQueries["touchLastLoginDatetime"]["query"]);
-        $sqlStmt->bind_param(DB::$sqlQueries["login"]["types"], $this->email);
+        $sqlStmt->bind_param(
+            DB::$sqlQueries["touchLastLoginDatetime"]["types"], $this->email);
         $sqlStmt->execute();
         
         $sqlStmt->close();

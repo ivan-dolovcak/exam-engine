@@ -11,8 +11,13 @@ $password = $_POST["password"];
 
 require_once "user_controller.php";
 
-$user = User::makeViaLogin($email, $password);
+$user = User::makeViaLogin($email);
 
-$_SESSION["formMsg"] = $user->login();
+// Check login
+$_SESSION["formMsg"] = $user->login($password);
+if ($_SESSION["formMsg"] !== null) {
+    header("Location: /views/login.php");
+    die;
+}
 
 header("Location: /");

@@ -24,7 +24,7 @@ if ($_SESSION["formMsg"] !== null) {
 }
 
 // Check login
-$_SESSION["formMsg"] = $user->login();
+$_SESSION["formMsg"] = $user->login($password);
 if ($_SESSION["formMsg"] !== null) {
     header("Location: /views/register.php");
     die;

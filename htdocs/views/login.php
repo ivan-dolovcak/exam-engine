@@ -20,6 +20,7 @@
             <input type="password" name="password">
             <br>
             <input type="submit" value="Prijavi me">
+            <?php echo $_SESSION["formMsg"] ?? ""; ?>
         </form>
     </main>
 
@@ -28,3 +29,8 @@
     </footer>
 </body>
 </html>
+
+<?php
+// Clear old message on page refresh
+if ($_SERVER["REQUEST_METHOD"] != "POST")
+    unset($_SESSION["formMsg"]);
