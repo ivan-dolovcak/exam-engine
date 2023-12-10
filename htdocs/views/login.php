@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
@@ -11,7 +12,7 @@
     <main>
         <h2>Prijava</h2>
         
-        <form action="">
+        <form action="/include/login_process.php" method="post">
             <label for="email">E-mail</label>
             <input type="email" name="email">
             <br>

@@ -9,7 +9,18 @@ class DB
         "register" => [
             "query" => "insert into `User`
                         values (default, ?, ?, ?, ?, default, default);",
-            "types" => "ssss",
+            "types" => "ssss"
+        ],
+        "login" => [
+            "query" => "select * from `User`
+                        where `email`=?;",
+            "types" => "s"
+        ],
+        "touchLastLoginDatetime" => [
+            "query" => "update `User`
+                        set `lastLoginDatetime` = current_timestamp()
+                        where `email`=?;",
+            "types" => "s"
         ],
     ];
 
@@ -43,5 +54,10 @@ class DB
         }
 
         return $sqlConn;
+    }
+
+    public static function makeHash(string $raw): string
+    {
+        return password_hash($raw, PASSWORD_BCRYPT);
     }
 }
