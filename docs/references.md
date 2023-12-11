@@ -23,6 +23,11 @@ project, which I will be referencing in my thesis paper.
 - VCS: git: https://git-scm.com/
 - Terminal emulator: kitty: https://sw.kovidgoyal.net/kitty/
 - FTP uploading : lftp
+- phpMyAdmin: https://www.phpmyadmin.net/
+
+## Standards followed
+
+- Semantic Versioning
 
 ## Web stack
 
