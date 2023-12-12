@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-require_once "user_controller.php";
-if (isset($_SESSION["user"]))
-    unserialize($_SESSION["user"])->logout();
+session_unset();
+session_destroy();
 
 header("Location: /");
 die;

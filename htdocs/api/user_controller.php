@@ -96,8 +96,8 @@ class User
         $sqlResult = $sqlStmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
-        if (! isset($userRow) || ! password_verify(
-            $password, $userRow["passwordHash"]))
+        if (! isset($userRow) 
+            || ! password_verify($password, $userRow["passwordHash"]))
             return "Greška: pogrešni podaci za prijavu.";
 
         // Update last login timestamp
@@ -119,12 +119,10 @@ class User
 
         $_SESSION["user"] = serialize($this);
 
-        return null;
-    }
+        // Set login cookie (used for dynamic nav link)
+        $cookieResult = setcookie("exam_engine_login", "",
+            strtotime("+30 days"), "/"); 
 
-    public function logout(): void
-    {
-        unset($_SESSION);
-        session_destroy();
+        return null; // No error message -> login successful
     }
 }
