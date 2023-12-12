@@ -35,7 +35,8 @@ class DB
         $sqlAuth = json_decode(file_get_contents($sqlAuthPath))->sql;
 
         if ($sqlAuth === null)
-            throw new Exception("Error decoding JSON: " + json_last_error_msg());
+            throw new Exception(
+                "Error decoding JSON: " + json_last_error_msg());
 
         return $sqlAuth;
     }
@@ -45,8 +46,9 @@ class DB
         if (! isset(self::$sqlAuth))
             self::$sqlAuth = self::readSqlAuth();
         
-        $sqlConn = new mysqli(self::$sqlAuth->hostname, self::$sqlAuth->username, 
-            self::$sqlAuth->password, self::$sqlAuth->database);
+        $sqlConn = new mysqli(self::$sqlAuth->hostname,
+            self::$sqlAuth->username, self::$sqlAuth->password, 
+            self::$sqlAuth->database);
 
         if ($sqlConn->connect_errno) {
             printf("SQL connection failed: %s\n", $sqlConn->connect_error);

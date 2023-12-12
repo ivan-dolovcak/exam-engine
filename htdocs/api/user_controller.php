@@ -39,7 +39,7 @@ class User
 
     public static function makeViaSessionVar(): ?self
     {
-        if (session_status() != PHP_SESSION_ACTIVE)
+        if (! isset($_SESSION))
             session_start();
         
         if (isset($_SESSION["user"])) {
@@ -117,11 +117,11 @@ class User
         $this->creationDate = new DateTime($userRow["creationDate"]);
         $this->lastLoginDatetime = new DateTime($userRow["lastLoginDatetime"]);
 
+        // save the User object in the session
         $_SESSION["user"] = serialize($this);
 
         // Set login cookie (used for dynamic nav link)
-        $cookieResult = setcookie("exam_engine_login", "",
-            strtotime("+30 days"), "/"); 
+        setcookie("exam_engine_login", "_", strtotime("+30 days"), "/");
 
         return null; // No error message -> login successful
     }

@@ -1,7 +1,4 @@
 <?php
-if (! isset($_SESSION))
-    session_start();
-
 function getProfileLink(): string
 {
     if (isset($_SESSION["user"])) {
