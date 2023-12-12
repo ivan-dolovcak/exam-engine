@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v0.2.0 (2023-12-12)
+
+- add views & logic for user login/register
+  - loosely following the MVC model
+- dynamic header link
+  - if user logged in, show "Profile"
+  - if not, show "Register" or "Log in" (if cookie exists)
+  - login cookie exists for 30 days since the last login
+
 ## v0.1.1 (2023-12-09)
 
 - add more basic include files
