@@ -12,7 +12,7 @@
     <main>
         <h2>Prijava</h2>
         
-        <form action="/include/login_process.php" method="post">
+        <form action="/api/login_process.php" method="post">
             <label for="email">E-mail</label>
             <input type="email" name="email">
             <br>
@@ -22,6 +22,8 @@
             <input type="submit" value="Prijavi me">
             <?php echo $_SESSION["formMsg"] ?? ""; ?>
         </form>
+
+        <p>Nemate račun? <a href="/views/register.php">Registrirajte se</a></p>
     </main>
 
     <footer>

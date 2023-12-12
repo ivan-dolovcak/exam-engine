@@ -33,3 +33,7 @@ mark#version {
 input {
     margin: 2px;
 }
+
+a {
+    color: royalblue;
+}

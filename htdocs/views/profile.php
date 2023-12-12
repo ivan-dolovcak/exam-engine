@@ -24,7 +24,7 @@ if (isset($user)) {
 ?>
 
 <?php if (isset($user)): ?>
-    <a href="/include/logout.php">Odjavi me</a>
+    <a href="/api/logout.php">Odjavi me</a>
 <?php endif; ?>
     </main>
 
