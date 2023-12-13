@@ -3,9 +3,9 @@
 <?php
 # Put git tag+commit number in bottom right corner
 
-$versionFile = $_SERVER["DOCUMENT_ROOT"] . "/.server/.app_version";
+$versionFile = $_SERVER["DOCUMENT_ROOT"] . "/.app_version";
 
-if (!file_exists($versionFile))
+if (! file_exists($versionFile))
     exit;
 
 echo '<a href="https://github.com/ivan-dolovcak/exam-engine/" target="_blank">',

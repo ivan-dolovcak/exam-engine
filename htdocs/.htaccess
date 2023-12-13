@@ -6,11 +6,12 @@ DirectoryIndex index.php index.html
     # This is the real path of the hosting service docroot, probably symlinked 
     # to /public_html:
     php_value auto_prepend_file \
-        /storage/ssd4/734/21605734/public_html/.server/common.php
+        /storage/ssd4/734/21605734/public_html/api/.common.php
 
     <IfDefine DEVELOPMENT>
+        # This is passed to PHP:
         SetEnv DEVELOPMENT "true"
-        php_value auto_prepend_file /srv/http/.server/common.php
+        php_value auto_prepend_file /srv/http/api/.common.php
     </IfDefine>
 </IfModule>
 
@@ -23,5 +24,10 @@ DirectoryIndex index.php index.html
 <IfModule mod_autoindex.c>
     Options -Indexes
 </IfModule>
+
+# Deny all hidden files:
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
 
 # TODO: add rules for URL rewriting (pretty URL's)
