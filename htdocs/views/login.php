@@ -1,4 +1,13 @@
-<?php session_start(); ?>
+<?php
+session_start();
+
+require_once "util.php";
+require_once "user_controller.php";
+$user = User::ctorViaSessionVar();
+// User has to be logged out to use this page. If not, redirect:
+if (isset($user))
+    Util::redirect("/");
+?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
@@ -20,7 +29,7 @@
             <input type="password" name="password">
             <br>
             <input type="submit" value="Prijavi me">
-            <?php echo $_SESSION["formMsg"] ?? ""; ?>
+            <?php echo Util::getFormMsg(); ?>
         </form>
 
         <p>Nemate račun? <a href="/views/register.php">Registrirajte se</a></p>
@@ -31,8 +40,3 @@
     </footer>
 </body>
 </html>
-
-<?php
-// Clear old message on page refresh
-if ($_SERVER["REQUEST_METHOD"] != "POST")
-    unset($_SESSION["formMsg"]);

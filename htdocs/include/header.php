@@ -21,8 +21,9 @@ function getProfileLink(): string
 <hr>
 
 <nav>
-    <a href="/">Početna</a>
+    <a href="/views/home.php">Početna</a>
     <?php echo getProfileLink(); ?>
+    <a href="/">O nama</a>
 </nav>
 
 <hr>

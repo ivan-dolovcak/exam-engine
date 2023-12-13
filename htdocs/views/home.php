@@ -6,12 +6,12 @@ require_once "user_controller.php";
 $user = User::ctorViaSessionVar();
 // User has to be logged in to use this page. If not, redirect:
 if (! isset($user))
-    Util::redirect("/");
+    Util::redirect("/views/login.php");
 ?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <?php require_once "head.php"; setPageTitle("Profil"); ?>
+    <?php require_once "head.php"; setPageTitle("O nama"); ?>
 </head>
 <body>
     <header>
@@ -19,13 +19,9 @@ if (! isset($user))
     </header>
 
     <main>
-        <h2>Profil</h2>
+        <h2>Moji ispiti</h2>
         
-<?php
-    echo "<p>Dobro došli, ", $user->firstName, " ", $user->lastName, "!</p>";
-?>
-
-    <a href="/api/logout.php">Odjavi me</a>
+        <p>...</p>
     </main>
 
     <footer>

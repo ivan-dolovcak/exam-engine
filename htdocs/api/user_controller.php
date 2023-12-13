@@ -9,13 +9,10 @@ class User
     public DateTime $creationDate;
     public DateTime $lastLoginDatetime;
 
-    private function __construct()
-    {
+    private function __construct() { }
 
-    }
-
-    public static function makeViaRegister(string $email, string $password, 
-        string $firstName, string $lastName): self
+    public static function ctorViaRegister(string $email, string $password, 
+        string $firstName, string $lastName) : self
     {
         require_once "db_controller.php";
         $obj = new self();
@@ -27,8 +24,7 @@ class User
         return $obj;
     }
 
-    public static function makeViaLogin(string $email)
-        : self
+    public static function ctorViaLogin(string $email) : self
     {
         require_once "db_controller.php";
         $obj = new self();
@@ -37,21 +33,16 @@ class User
         return $obj;
     }
 
-    public static function makeViaSessionVar(): ?self
+    public static function ctorViaSessionVar() : ?self
     {
-        if (! isset($_SESSION))
-            session_start();
-        
-        if (isset($_SESSION["user"])) {
+        if (isset($_SESSION["user"]))
             return unserialize($_SESSION["user"]);
-        }
         else
             return null;
     }
 
-    public function register(): ?string
+    public function register() : ?string
     {
-        // SQL prep
         require_once "db_controller.php";
 
         $sqlConn = DB::makeSqlConn();
@@ -61,29 +52,27 @@ class User
             $this->email, $this->passwordHash, $this->firstName, 
             $this->lastName);
 
-        // SQL exec
         try {
             $sqlStmt->execute();
             $regResult = null;
         }
         catch (mysqli_sql_exception) {
-            if ($sqlStmt->errno == 1062) // handle duplicate key `email`:
+            // Handle duplicate key `email`:
+            if ($sqlStmt->errno == 1062)
                 $regResult = "Greška: e-mail '$this->email' je već zauzet.";
             else
                 $regResult = "Greška baze podataka: " . $sqlStmt->error . " #" 
                     . $sqlStmt->errno;
         }
         finally {
-            // cleanup
             $sqlStmt->close();
             $sqlConn->close();
             return $regResult;
         }
     }
 
-    public function login(string $password): ?string
+    public function login(string $password) : ?string
     {
-        // SQL prep
         require_once "db_controller.php";
 
         $sqlConn = DB::makeSqlConn();
@@ -91,7 +80,6 @@ class User
 
         $sqlStmt->bind_param(DB::$sqlQueries["login"]["types"], $this->email);
 
-        // SQL exec
         $sqlStmt->execute();
         $sqlResult = $sqlStmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
@@ -117,10 +105,10 @@ class User
         $this->creationDate = new DateTime($userRow["creationDate"]);
         $this->lastLoginDatetime = new DateTime($userRow["lastLoginDatetime"]);
 
-        // save the User object in the session
+        // Save the User object in the session:
         $_SESSION["user"] = serialize($this);
 
-        // Set login cookie (used for dynamic nav link)
+        // Set login cookie (used for dynamic nav link):
         setcookie("exam_engine_login", "_", strtotime("+30 days"), "/");
 
         return null; // No error message -> login successful

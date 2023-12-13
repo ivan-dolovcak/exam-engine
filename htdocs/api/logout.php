@@ -4,5 +4,5 @@ session_start();
 session_unset();
 session_destroy();
 
-header("Location: /");
-die;
+require_once "util.php";
+Util::redirect("/");

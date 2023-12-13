@@ -1,10 +1,13 @@
 <?php
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-require_once ".sql_auth.php";
+require ".sql_auth.php";
 
 class DB
 {
+    // This is a static class:
+    private function __construct() { }
+
     public static $sqlQueries = [
         "register" => [
             "query" => "insert into `User`
@@ -24,20 +27,21 @@ class DB
         ],
     ];
 
-    public static function makeSqlConn(): mysqli
+    public static function makeSqlConn() : mysqli
     {
         $sqlConn = new mysqli(SQL_HOSTNAME, SQL_USERNAME, SQL_PASSWORD, 
             SQL_DATABASE);
 
         if ($sqlConn->connect_errno) {
-            printf("SQL connection failed: %s\n", $sqlConn->connect_error);
+            echo "Greška baze podataka: ", $sqlConn->error, " #",
+                $sqlConn->errno;
             die;
         }
 
         return $sqlConn;
     }
 
-    public static function makeHash(string $raw): string
+    public static function makeHash(string $raw) : string
     {
         return password_hash($raw, PASSWORD_BCRYPT);
     }

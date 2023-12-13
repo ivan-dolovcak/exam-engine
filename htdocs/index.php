@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php
+session_start();
+require_once "util.php";
+?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
@@ -10,9 +13,9 @@
     </header>
 
     <main>
-        <h2>Početna</h2>
+        <h2>O Exam Engine</h2>
         
-        <p>Dobro došli na početnu stranicu usluge Exam Engine!</p>
+        <p>Dobro došli na opisnu stranicu usluge Exam Engine!</p>
     </main>
 
     <footer>

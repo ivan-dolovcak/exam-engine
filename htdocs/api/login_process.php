@@ -1,23 +1,23 @@
 <?php
 session_start();
+require_once "util.php";
 
-if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    header("Location: /views/login.php");
-    die;
-}
+// Only allow POST requests
+if ($_SERVER["REQUEST_METHOD"] !== "POST")
+    Util::previousPage();
 
+// Fetch form data
 $email = $_POST["email"];
 $password = $_POST["password"];
 
 require_once "user_controller.php";
-
-$user = User::makeViaLogin($email);
+$user = User::ctorViaLogin($email);
 
 // Check login
 $_SESSION["formMsg"] = $user->login($password);
-if ($_SESSION["formMsg"] !== null) {
-    header("Location: /views/login.php");
-    die;
-}
+if ($_SESSION["formMsg"] !== null)
+    // In case of login error, show form again with error message:
+    Util::redirect("/views/login.php");
 
-header("Location: /");
+// Login success:
+Util::redirect("/views/home.php");
