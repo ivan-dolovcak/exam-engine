@@ -14,7 +14,6 @@ class User
     public static function ctorViaRegister(string $email, string $password, 
         string $firstName, string $lastName) : self
     {
-        require_once "db_controller.php";
         $obj = new self();
         $obj->email = $email;
         $obj->passwordHash = DB::makeHash($password);
@@ -26,7 +25,6 @@ class User
 
     public static function ctorViaLogin(string $email) : self
     {
-        require_once "db_controller.php";
         $obj = new self();
         $obj->email = $email;
 
@@ -43,8 +41,6 @@ class User
 
     public function register() : ?string
     {
-        require_once "db_controller.php";
-
         $sqlConn = DB::makeSqlConn();
         $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["register"]["query"]);
 
@@ -73,8 +69,6 @@ class User
 
     public function login(string $password) : ?string
     {
-        require_once "db_controller.php";
-
         $sqlConn = DB::makeSqlConn();
         $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["login"]["query"]);
 

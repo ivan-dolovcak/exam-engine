@@ -1,5 +1,5 @@
 <?php
-define("SQL_HOSTNAME", "localhost");
-define("SQL_USERNAME", "exam_engine");
-define("SQL_DATABASE", "EXAM_ENGINE");
-define("SQL_PASSWORD", "admin");
+const SQL_HOSTNAME = "localhost";
+const SQL_USERNAME = "exam_engine";
+const SQL_DATABASE = "EXAM_ENGINE";
+const SQL_PASSWORD = "admin";

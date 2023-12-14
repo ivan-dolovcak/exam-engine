@@ -10,6 +10,9 @@ ini_set("display_errors", true);
 ini_set("display_startup_errors", true);
 
 set_include_path(implode(":", array(
-    $_SERVER["DOCUMENT_ROOT"] . "/include",
+    $_SERVER["DOCUMENT_ROOT"] . "/partials",
     $_SERVER["DOCUMENT_ROOT"] . "/api")
 ));
+
+// Auto-require class definitions:
+spl_autoload_register(fn($className) => require "$className.php");

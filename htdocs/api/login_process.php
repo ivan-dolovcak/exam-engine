@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once "util.php";
 
 // Only allow POST requests
 if ($_SERVER["REQUEST_METHOD"] !== "POST")
@@ -10,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST")
 $email = $_POST["email"];
 $password = $_POST["password"];
 
-require_once "user_controller.php";
 $user = User::ctorViaLogin($email);
 
 // Check login

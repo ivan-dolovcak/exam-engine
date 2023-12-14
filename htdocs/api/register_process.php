@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once "util.php";
 
 // Only allow POST requests
 if ($_SERVER["REQUEST_METHOD"] !== "POST")
@@ -12,7 +11,6 @@ $password = $_POST["password"];
 $firstName = $_POST["firstName"];
 $lastName = $_POST["lastName"];
 
-require_once "user_controller.php";
 $user = User::ctorViaRegister($email, $password, $firstName, $lastName);
 
 // Check register

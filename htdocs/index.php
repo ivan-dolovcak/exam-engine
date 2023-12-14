@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once "util.php";
 ?>
 <!DOCTYPE html>
 <html lang="hr">

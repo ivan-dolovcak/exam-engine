@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-require_once "util.php";
-require_once "user_controller.php";
 $user = User::ctorViaSessionVar();
 // User has to be logged out to use this page. If not, redirect:
 if (isset($user))
