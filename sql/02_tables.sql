@@ -2,6 +2,7 @@ use `EXAM_ENGINE`;
 
 create table `User` (
     `ID`                   mediumint unsigned not null auto_increment,
+    `username`             varchar(30) not null,
     `email`                varchar(50) not null,
     `passwordHash`         char(60) not null, -- PHP PASSWORD_BCRYPT
     `firstName`            varchar(50) not null,
@@ -9,7 +10,10 @@ create table `User` (
     `creationDate`         date not null default current_date(),
     `lastLoginDatetime`    datetime not null default current_timestamp(),
     primary key (`ID`),
-    unique (`email`)
+    constraint `UK_Username`
+        unique key (`username`),
+    constraint `UK_UserEmail`
+        unique key (`email`)
 );
 
 create table `Document` (

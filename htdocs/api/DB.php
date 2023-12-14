@@ -11,8 +11,8 @@ class DB
     public static $sqlQueries = [
         "register" => [
             "query" => "insert into `User`
-                        values (default, ?, ?, ?, ?, default, default);",
-            "types" => "ssss"
+                        values (default, ?, ?, ?, ?, ?, default, default);",
+            "types" => "sssss"
         ],
         "login" => [
             "query" => "select * from `User`

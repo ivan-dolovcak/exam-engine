@@ -21,6 +21,8 @@ if (! isset($user))
         
 <?php
     echo "<p>Dobro došli, ", $user->firstName, " ", $user->lastName, "!</p>";
+    print_r($user);
+    echo date_default_timezone_get();
 ?>
 
     <a href="/api/logout.php">Odjavi me</a>

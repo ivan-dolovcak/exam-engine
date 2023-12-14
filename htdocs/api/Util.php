@@ -36,4 +36,12 @@ class Util
         else
             return "[app version unknown]";
     }
+
+    public static function sanitizeFormInput(string $input) : string
+    {
+        $input = trim($input);
+        $input = htmlspecialchars($input);
+        
+        return $input;
+    }
 }

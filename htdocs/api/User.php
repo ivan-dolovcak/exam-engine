@@ -2,6 +2,7 @@
 class User
 {
     public int $ID;
+    public string $username;
     public string $email;
     public string $passwordHash;
     public string $firstName;
@@ -9,12 +10,15 @@ class User
     public DateTime $creationDate;
     public DateTime $lastLoginDatetime;
 
+    public const REGEX_USERNAME_CHECK = "/[^a-z_\.0-9]+/";
+
     private function __construct() { }
 
-    public static function ctorViaRegister(string $email, string $password, 
-        string $firstName, string $lastName) : self
+    public static function ctorViaRegister(string $username, string $email, 
+        string $password, string $firstName, string $lastName) : self
     {
         $obj = new self();
+        $obj->username = $username;
         $obj->email = $email;
         $obj->passwordHash = DB::makeHash($password);
         $obj->firstName = $firstName;
@@ -45,8 +49,8 @@ class User
         $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["register"]["query"]);
 
         $sqlStmt->bind_param(DB::$sqlQueries["register"]["types"], 
-            $this->email, $this->passwordHash, $this->firstName, 
-            $this->lastName);
+            $this->username, $this->email, $this->passwordHash,
+            $this->firstName, $this->lastName);
 
         try {
             $sqlStmt->execute();

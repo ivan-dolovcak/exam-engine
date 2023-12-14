@@ -6,8 +6,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST")
     Util::previousPage();
 
 // Fetch form data
-$email = $_POST["email"];
-$password = $_POST["password"];
+$email = Util::sanitizeFormInput($_POST["email"]);
+$password = Util::sanitizeFormInput($_POST["password"]);
 
 $user = User::ctorViaLogin($email);
 

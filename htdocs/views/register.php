@@ -20,11 +20,17 @@ if (isset($user))
         <h2>Registracija</h2>
         
         <form method="post" action="/api/register_process.php">
+            <label for="username">Korisničko ime</label>
+            <input required type="text" name="username">
+            <br>
             <label for="email">E-mail</label>
             <input required type="email" name="email">
             <br>
             <label for="password">Lozinka</label>
             <input required type="password" name="password">
+            <br>
+            <label for="passwordConfirm">Potvrdi lozinku</label>
+            <input required type="password" name="passwordConfirm">
             <br>
             <label for="firstName">Ime</label>
             <input required type="text" name="firstName">
