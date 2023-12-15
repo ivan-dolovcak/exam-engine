@@ -1,9 +1,11 @@
 # Project references
 
+
 ## About
 
-This file is for tracking all websites/documents/tools I used during the 
-project, which I will be referencing in my thesis paper.
+This file is for tracking all websites, documents and software used during  
+project development, which will be referenced in the thesis paper.
+
 
 ## Sources
 
@@ -14,24 +16,43 @@ project, which I will be referencing in my thesis paper.
 - MDN docs: https://developer.mozilla.org/en-US/
 - git docs: https://git-scm.com/doc
 - MariaDB docs: https://mariadb.com/kb/en/documentation/
+- GitHub docs: https://docs.github.com/en
+
 
 ## Software used
 
 - OS: Arch Linux: https://archlinux.org/
-- IDE(project): VSCodium: https://vscodium.com/
-- IDE(config, git, individual files): vim: https://www.vim.org/
+- IDE (project): VSCodium: https://vscodium.com/
+- IDE (config, git, individual files): vim: https://www.vim.org/
 - VCS: git: https://git-scm.com/
 - Terminal emulator: kitty: https://sw.kovidgoyal.net/kitty/
 - FTP uploading : lftp
 - phpMyAdmin: https://www.phpmyadmin.net/
+- regular expressions 101: https://regex101.com/
+- Web browsers: Mozilla Firefox, Ungoogled Chromium
+
 
 ## Standards followed
 
-- Semantic Versioning
+- Semantic Versioning: https://semver.org/
+- Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/
+
 
 ## Web stack
 
 - Development
     - Arch Linux + Apache 2.4 + PHP 8.2 + MariaDB 15.2
 - Production (000webhost.com)
-    - RHEL 7.9 (Maipo) + Apache 2.0? + PHP PHP 8.2 + NMariadb ?
+    - RHEL 7.9 (Maipo) + Apache 2.0? + PHP PHP 8.2 + MariaDB ?
+
+
+## Languages used
+
+- HTML
+- Markdown
+- LaTeX
+- SCSS
+- PHP
+- TypeScript
+- Unix shell
+- SQL (MariaDB)
