@@ -9,6 +9,7 @@
 - Hard line wrapping at 80 chars
 - All source files end with an empty line
 - Indentation: 4 spaces
+- No trailing whitespace
 - camelCase variables, UPPERCASE_SNAKE_CASE constants, PascalCase classes
 - Use the legal ASCII characters for all identifiers
 - Write good comments
