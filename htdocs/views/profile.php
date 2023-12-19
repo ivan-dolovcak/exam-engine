@@ -21,8 +21,16 @@ if (! isset($user))
         
 <?php
     echo "<p>Dobro došli, ", $user->firstName, " ", $user->lastName, "!</p>";
-    print_r($user);
-    echo date_default_timezone_get();
+    
+    echo "<ul>";
+    foreach ($user as $key => $value) {
+        if ($value instanceof DateTime)
+            $value = $value->format("Y/m/d H:i:s");
+
+        echo "<li>", $key, " => ", $value, "</li>";
+    }
+        
+    echo "</ul>";
 ?>
 
     <a href="/api/logout.php">Odjavi me</a>

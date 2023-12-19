@@ -6,13 +6,13 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST")
     Util::previousPage();
 
 // Fetch form data
-$email = Util::sanitizeFormInput($_POST["email"]);
+$emailOrPassword = Util::sanitizeFormInput($_POST["emailOrPassword"]);
 $password = Util::sanitizeFormInput($_POST["password"]);
 
-$user = User::ctorViaLogin($email);
+$user = User::ctorEmpty();
 
 // Check login
-$_SESSION["formMsg"] = $user->login($password);
+$_SESSION["formMsg"] = $user->login($emailOrPassword, $password);
 if ($_SESSION["formMsg"] !== null)
     // In case of login error, show form again with error message:
     Util::redirect("/views/login.php");

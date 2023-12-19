@@ -20,8 +20,8 @@ if (isset($user))
         <h2>Prijava</h2>
         
         <form action="/api/login_process.php" method="post">
-            <label for="email">E-mail</label>
-            <input type="email" name="email">
+            <label for="emailOrPassword">E-mail ili korisničko ime</label>
+            <input type="text" name="emailOrPassword">
             <br>
             <label for="password">Lozinka</label>
             <input type="password" name="password">

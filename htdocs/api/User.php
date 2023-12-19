@@ -27,12 +27,9 @@ class User
         return $obj;
     }
 
-    public static function ctorViaLogin(string $email) : self
+    public static function ctorEmpty() : self
     {
-        $obj = new self();
-        $obj->email = $email;
-
-        return $obj;
+        return new self();
     }
 
     public static function ctorViaSessionVar() : ?self
@@ -45,6 +42,12 @@ class User
 
     public function register() : ?string
     {
+        // Check if username is legal:
+        if (preg_match(User::REGEX_USERNAME_CHECK, $this->username)) {
+            $regResult = "Greška: nedozvoljeni znakovi u korisničkom imenu";
+            return $regResult;
+        }
+
         $sqlConn = DB::makeSqlConn();
         $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["register"]["query"]);
 
@@ -57,9 +60,14 @@ class User
             $regResult = null;
         }
         catch (mysqli_sql_exception) {
-            // Handle duplicate key `email`:
-            if ($sqlStmt->errno == 1062)
-                $regResult = "Greška: e-mail '$this->email' je već zauzet.";
+            // Handle email/username duplicate:
+            if ($sqlStmt->errno == 1062) {
+                if (str_contains($sqlStmt->error, "UK_Username"))
+                    $regResult = "Greška: korisničko ime '$this->username'"
+                        . " je već zauzeto.";
+                else
+                    $regResult = "Greška: e-mail '$this->email' je već zauzet.";
+            }
             else
                 $regResult = "Greška baze podataka: " . $sqlStmt->error . " #" 
                     . $sqlStmt->errno;
@@ -71,12 +79,13 @@ class User
         }
     }
 
-    public function login(string $password) : ?string
+    public function login(string $usernameOrEmail, string $password) : ?string
     {
         $sqlConn = DB::makeSqlConn();
         $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["login"]["query"]);
 
-        $sqlStmt->bind_param(DB::$sqlQueries["login"]["types"], $this->email);
+        $sqlStmt->bind_param(DB::$sqlQueries["login"]["types"],
+            $usernameOrEmail, $usernameOrEmail);
 
         $sqlStmt->execute();
         $sqlResult = $sqlStmt->get_result();
@@ -90,7 +99,7 @@ class User
         $sqlStmt = $sqlConn->prepare(
             DB::$sqlQueries["touchLastLoginDatetime"]["query"]);
         $sqlStmt->bind_param(
-            DB::$sqlQueries["touchLastLoginDatetime"]["types"], $this->email);
+            DB::$sqlQueries["touchLastLoginDatetime"]["types"], $userRow["ID"]);
         $sqlStmt->execute();
         
         $sqlStmt->close();
@@ -98,6 +107,7 @@ class User
 
         // Fetch the rest of user data
         $this->ID = $userRow["ID"];
+        $this->username = $userRow["username"];
         $this->firstName = $userRow["firstName"];
         $this->lastName = $userRow["lastName"];
         $this->creationDate = new DateTime($userRow["creationDate"]);

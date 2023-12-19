@@ -16,14 +16,14 @@ class DB
         ],
         "login" => [
             "query" => "select * from `User`
-                        where `email` = ?;",
-            "types" => "s"
+                        where `email` = ? or `username` = ?;",
+            "types" => "ss"
         ],
         "touchLastLoginDatetime" => [
             "query" => "update `User`
                         set `lastLoginDatetime` = current_timestamp()
-                        where `email`= ?;",
-            "types" => "s"
+                        where `ID`= ?;",
+            "types" => "i"
         ],
     ];
 
