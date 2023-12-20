@@ -7,8 +7,8 @@ create table `User` (
     `passwordHash`         char(60) not null, -- PHP PASSWORD_BCRYPT
     `firstName`            varchar(50) not null,
     `lastName`             varchar(50) not null,
-    `creationDate`         date not null default current_date(),
-    `lastLoginDatetime`    datetime not null default current_timestamp(),
+    `creationDate`         date not null default utc_date(),
+    `lastLoginDatetime`    datetime not null default utc_timestamp(),
     primary key (`ID`),
     constraint `UK_Username`
         unique key (`username`),
@@ -23,7 +23,7 @@ create table `Document` (
     `passwordHash`        char(60),
     `authorID`            mediumint unsigned,
     `deadlineDatetime`    datetime,
-    `creationDate`        date not null default current_date(),
+    `creationDate`        date not null default utc_date(),
     `documentJson`        json not null,
     `solutionJson`        json,
     primary key (`ID`),

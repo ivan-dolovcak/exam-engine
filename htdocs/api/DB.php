@@ -23,7 +23,7 @@ class DB
         ],
         "touchLastLoginDatetime" => [
             "query" => "update `User`
-                        set `lastLoginDatetime` = current_timestamp()
+                        set `lastLoginDatetime` = utc_timestamp()
                         where `ID`= ?;",
             "types" => "i"
         ],
