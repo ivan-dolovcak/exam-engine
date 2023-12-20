@@ -12,8 +12,6 @@ class User
 
     public const REGEX_USERNAME_CHECK = "/[^a-z_\.0-9]+/";
 
-    private function __construct() { }
-
     public static function ctorViaRegister(string $username, string $email, 
         string $password, string $firstName, string $lastName) : self
     {
@@ -25,11 +23,6 @@ class User
         $obj->lastName = $lastName;
 
         return $obj;
-    }
-
-    public static function ctorEmpty() : self
-    {
-        return new self();
     }
 
     public static function ctorViaSessionVar() : ?self
@@ -75,6 +68,7 @@ class User
         finally {
             $sqlStmt->close();
             $sqlConn->close();
+
             return $regResult;
         }
     }
@@ -91,8 +85,12 @@ class User
         $sqlResult = $sqlStmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
-        if (! isset($userRow) 
-            || ! password_verify($password, $userRow["passwordHash"]))
+        if (! isset($userRow))
+            return "Greška: pogrešni podaci za prijavu.";
+
+        $this->loadUser($userRow["ID"]);
+
+        if(! password_verify($password, $this->passwordHash))
             return "Greška: pogrešni podaci za prijavu.";
 
         // Update last login timestamp
@@ -105,14 +103,6 @@ class User
         $sqlStmt->close();
         $sqlConn->close();
 
-        // Fetch the rest of user data
-        $this->ID = $userRow["ID"];
-        $this->username = $userRow["username"];
-        $this->firstName = $userRow["firstName"];
-        $this->lastName = $userRow["lastName"];
-        $this->creationDate = new DateTime($userRow["creationDate"]);
-        $this->lastLoginDatetime = new DateTime($userRow["lastLoginDatetime"]);
-
         // Save the User object in the session:
         $_SESSION["user"] = serialize($this);
 
@@ -120,5 +110,27 @@ class User
         setcookie("exam_engine_login", "_", strtotime("+30 days"), "/");
 
         return null; // No error message -> login successful
+    }
+
+    private function loadUser(int $ID) : void
+    {
+        $sqlConn = DB::makeSqlConn();
+        $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["loadUser"]["query"]);
+
+        $sqlStmt->bind_param(DB::$sqlQueries["loadUser"]["types"], $ID);
+
+        $sqlStmt->execute();
+        $sqlStmt->close();
+        $sqlConn->close();
+        
+        $sqlResult = $sqlStmt->get_result();
+        $userRow = $sqlResult->fetch_assoc();
+
+        foreach ($userRow as $column => $value) {
+            if (preg_match("/Date/", $column))
+                $value = new DateTime($value);
+
+            $this->$column = $value;
+        }
     }
 }

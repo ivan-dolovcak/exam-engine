@@ -15,9 +15,14 @@ class DB
             "types" => "sssss"
         ],
         "login" => [
-            "query" => "select * from `User`
+            "query" => "select `ID` from `User`
                         where `email` = ? or `username` = ?;",
             "types" => "ss"
+        ],
+        "loadUser" => [
+            "query" => "select * from `User`
+                        where `ID` = ?;",
+            "types" => "i"
         ],
         "touchLastLoginDatetime" => [
             "query" => "update `User`

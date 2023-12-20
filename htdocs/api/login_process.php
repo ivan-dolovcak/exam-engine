@@ -9,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST")
 $emailOrPassword = Util::sanitizeFormInput($_POST["emailOrPassword"]);
 $password = Util::sanitizeFormInput($_POST["password"]);
 
-$user = User::ctorEmpty();
+$user = new User();
 
 // Check login
 $_SESSION["formMsg"] = $user->login($emailOrPassword, $password);
