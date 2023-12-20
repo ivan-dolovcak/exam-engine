@@ -30,17 +30,19 @@ class DB
     ];
 
     public readonly mysqli $conn;
+    // Using prepared statements as basic protection against SQL injection
     public readonly mysqli_stmt $stmt;
+    
 
     public function __construct()
     {
-        $this->conn = new mysqli(
-            SQL_HOSTNAME, SQL_USERNAME, SQL_PASSWORD, SQL_DATABASE);
-
-        if ($this->conn->connect_errno) {
+        try {
+            $this->conn = new mysqli(SQL_HOSTNAME, SQL_USERNAME, SQL_PASSWORD,
+                SQL_DATABASE);
+        }
+        catch (mysqli_sql_exception $e) {
             // TODO: user-friendly error reporting
-            echo "Greška baze podataka: ", $this->conn->error, " #", 
-                $this->conn->errno;
+            echo "Greška baze podataka: ", $e->getMessage(), "#", $e->getCode();
             die;
         }
     }

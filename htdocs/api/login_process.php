@@ -10,12 +10,9 @@ $emailOrPassword = Util::sanitizeFormInput($_POST["emailOrPassword"]);
 $password = Util::sanitizeFormInput($_POST["password"]);
 
 $user = new User();
-
-// Check login
-$_SESSION["formMsg"] = $user->login($emailOrPassword, $password);
-if ($_SESSION["formMsg"] !== null)
-    // In case of login error, show form again with error message:
+if (! $user->login($emailOrPassword, $password))
+    // In case of login error, show form again with error message
+    $_SESSION["formMsg"] = $user->errMsg;
     Util::redirect("/views/login.php");
 
-// Login success:
 Util::redirect("/views/home.php");

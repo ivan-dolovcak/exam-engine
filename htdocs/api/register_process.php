@@ -19,15 +19,13 @@ if ($password !== $passwordConfirm) {
     Util::redirect("/views/register.php");
 }
 
-$user = User::ctorViaRegister($username, $email, $password, $firstName, 
-    $lastName);
-
-// Check register
-$_SESSION["formMsg"] = $user->register();
-if ($_SESSION["formMsg"] !== null)
-    // In case of registration error, show form again with error message:
+$user = User::ctorViaRegister(
+    $username, $email, $password, $firstName, $lastName);
+if (! $user->register()) {
+    // In case of registration error, show form again with error message
+    $_SESSION["formMsg"] = $user->errMsg;
     Util::redirect("/views/register.php");
-
-// Register success: login user and redirect to to home view
-$user->login($username, $password); // Shouldn't return any errors
+}
+    
+$user->login($username, $password);
 Util::redirect("/views/home.php");

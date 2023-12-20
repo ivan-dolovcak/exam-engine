@@ -1,7 +1,7 @@
 <?php
 class Util
 {
-    // This is a static class:
+    // This is a util class with static methods only, no instantiation needed:
     private function __construct() { }
 
     public static function redirect(string $url) : void
@@ -37,9 +37,11 @@ class Util
             return "[app version unknown]";
     }
 
+    // Basic protection against XSS
     public static function sanitizeFormInput(string $input) : string
     {
         $input = trim($input);
+        $input = stripslashes($input);
         $input = htmlspecialchars($input);
         
         return $input;

@@ -9,8 +9,9 @@ class User
     public string $lastName;
     public DateTime $creationDate;
     public DateTime $lastLoginDatetime;
-
+    public ?string $errMsg;
     public const REGEX_USERNAME_CHECK = "/[^a-z_\.0-9]+/";
+
 
     public static function ctorViaRegister(string $username, string $email, 
         string $password, string $firstName, string $lastName) : self
@@ -33,12 +34,12 @@ class User
             return null;
     }
 
-    public function register() : ?string
+    public function register() : bool
     {
         // Check if username is legal:
         if (preg_match(User::REGEX_USERNAME_CHECK, $this->username)) {
-            $regResult = "Greška: nedozvoljeni znakovi u korisničkom imenu";
-            return $regResult;
+            $this->errMsg = "Greška: nedozvoljeni znakovi u korisničkom imenu";
+            return false;
         }
 
         $db = new DB();
@@ -46,27 +47,24 @@ class User
         try {
             $db->execStmt("register", $this->username, $this->email,
                 $this->passwordHash, $this->firstName, $this->lastName);
-            $regResult = null;
+            return true;
         }
-        catch (mysqli_sql_exception) {
+        catch (mysqli_sql_exception $e) {
             // Handle email/username duplicate:
-            if ($db->stmt->errno == 1062) {
-                if (str_contains($db->stmt->error, "UK_Username"))
-                    $regResult = "Greška: korisničko ime '$this->username'"
-                        . " je već zauzeto.";
-                else
-                    $regResult = "Greška: e-mail '$this->email' je već zauzet.";
-            }
+            if (str_contains($e->getMessage(), "UK_Username"))
+                $this->errMsg = "Greška: korisničko ime '$this->username'"
+                    . " je već zauzeto.";
+            else if (str_contains($e->getMessage(), "UK_UserEmail"))
+                $this->errMsg = "Greška: e-mail '$this->email' je već zauzet.";
             else
-                $regResult = "Greška baze podataka: " . $db->stmt->error . " #" 
-                    . $db->stmt->errno;
-        }
-        finally {
-            return $regResult;
+                $this->errMsg = "Greška baze podataka: " . $e->getMessage()
+                    . $e->getCode();
+            
+            return false;
         }
     }
 
-    public function login(string $usernameOrEmail, string $password) : ?string
+    public function login(string $usernameOrEmail, string $password) : bool
     {
         $db = new DB();
         $db->execStmt("login", $usernameOrEmail, $usernameOrEmail);
@@ -74,24 +72,29 @@ class User
         $sqlResult = $db->stmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
-        if (! isset($userRow))
-            return "Greška: pogrešni podaci za prijavu.";
+        if (! isset($userRow)) {
+            $this->errMsg = "Greška: pogrešni podaci za prijavu.";
+            return false;
+        }
 
-        // Update last login timestamp
+        // Update last login timestamp:
         (new DB())->execStmt("touchLastLoginDatetime", $userRow["ID"]);
 
+        // Read all remaining attributes:
         $this->loadUser($userRow["ID"]);
 
-        if(! password_verify($password, $this->passwordHash))
-            return "Greška: pogrešni podaci za prijavu.";
+        if(! password_verify($password, $this->passwordHash)) {
+            $this->errMsg = "Greška: pogrešni podaci za prijavu.";
+            return false;
+        }
 
         // Save the User object in the session:
         $_SESSION["user"] = serialize($this);
 
-        // Set login cookie (used for dynamic nav link):
+        // Set/update login cookie (used for dynamic nav link):
         setcookie("exam_engine_login", "_", strtotime("+30 days"), "/");
 
-        return null; // No error message -> login successful
+        return true;
     }
 
     private function loadUser(int $ID) : void
