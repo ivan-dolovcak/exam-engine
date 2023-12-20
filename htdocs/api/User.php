@@ -41,67 +41,49 @@ class User
             return $regResult;
         }
 
-        $sqlConn = DB::makeSqlConn();
-        $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["register"]["query"]);
-
-        $sqlStmt->bind_param(DB::$sqlQueries["register"]["types"], 
-            $this->username, $this->email, $this->passwordHash,
-            $this->firstName, $this->lastName);
+        $db = new DB();
 
         try {
-            $sqlStmt->execute();
+            $db->execStmt("register", $this->username, $this->email,
+                $this->passwordHash, $this->firstName, $this->lastName);
             $regResult = null;
         }
         catch (mysqli_sql_exception) {
             // Handle email/username duplicate:
-            if ($sqlStmt->errno == 1062) {
-                if (str_contains($sqlStmt->error, "UK_Username"))
+            if ($db->stmt->errno == 1062) {
+                if (str_contains($db->stmt->error, "UK_Username"))
                     $regResult = "Greška: korisničko ime '$this->username'"
                         . " je već zauzeto.";
                 else
                     $regResult = "Greška: e-mail '$this->email' je već zauzet.";
             }
             else
-                $regResult = "Greška baze podataka: " . $sqlStmt->error . " #" 
-                    . $sqlStmt->errno;
+                $regResult = "Greška baze podataka: " . $db->stmt->error . " #" 
+                    . $db->stmt->errno;
         }
         finally {
-            $sqlStmt->close();
-            $sqlConn->close();
-
             return $regResult;
         }
     }
 
     public function login(string $usernameOrEmail, string $password) : ?string
     {
-        $sqlConn = DB::makeSqlConn();
-        $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["login"]["query"]);
+        $db = new DB();
+        $db->execStmt("login", $usernameOrEmail, $usernameOrEmail);
 
-        $sqlStmt->bind_param(DB::$sqlQueries["login"]["types"],
-            $usernameOrEmail, $usernameOrEmail);
-
-        $sqlStmt->execute();
-        $sqlResult = $sqlStmt->get_result();
+        $sqlResult = $db->stmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
         if (! isset($userRow))
             return "Greška: pogrešni podaci za prijavu.";
 
+        // Update last login timestamp
+        (new DB())->execStmt("touchLastLoginDatetime", $userRow["ID"]);
+
         $this->loadUser($userRow["ID"]);
 
         if(! password_verify($password, $this->passwordHash))
             return "Greška: pogrešni podaci za prijavu.";
-
-        // Update last login timestamp
-        $sqlStmt = $sqlConn->prepare(
-            DB::$sqlQueries["touchLastLoginDatetime"]["query"]);
-        $sqlStmt->bind_param(
-            DB::$sqlQueries["touchLastLoginDatetime"]["types"], $userRow["ID"]);
-        $sqlStmt->execute();
-        
-        $sqlStmt->close();
-        $sqlConn->close();
 
         // Save the User object in the session:
         $_SESSION["user"] = serialize($this);
@@ -114,16 +96,10 @@ class User
 
     private function loadUser(int $ID) : void
     {
-        $sqlConn = DB::makeSqlConn();
-        $sqlStmt = $sqlConn->prepare(DB::$sqlQueries["loadUser"]["query"]);
-
-        $sqlStmt->bind_param(DB::$sqlQueries["loadUser"]["types"], $ID);
-
-        $sqlStmt->execute();
-        $sqlStmt->close();
-        $sqlConn->close();
+        $db = new DB();
+        $db->execStmt("loadUser", $ID);
         
-        $sqlResult = $sqlStmt->get_result();
+        $sqlResult = $db->stmt->get_result();
         $userRow = $sqlResult->fetch_assoc();
 
         foreach ($userRow as $column => $value) {

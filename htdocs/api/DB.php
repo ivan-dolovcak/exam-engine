@@ -5,10 +5,7 @@ require ".sql_auth.php";
 
 class DB
 {
-    // This is a static class:
-    private function __construct() { }
-
-    public static $sqlQueries = [
+    public const SQL_QUERIES = [
         "register" => [
             "query" => "insert into `User`
                         values (default, ?, ?, ?, ?, ?, default, default);",
@@ -32,22 +29,38 @@ class DB
         ],
     ];
 
-    public static function makeSqlConn() : mysqli
-    {
-        $sqlConn = new mysqli(SQL_HOSTNAME, SQL_USERNAME, SQL_PASSWORD, 
-            SQL_DATABASE);
+    public readonly mysqli $conn;
+    public readonly mysqli_stmt $stmt;
 
-        if ($sqlConn->connect_errno) {
-            echo "Greška baze podataka: ", $sqlConn->error, " #",
-                $sqlConn->errno;
+    public function __construct()
+    {
+        $this->conn = new mysqli(
+            SQL_HOSTNAME, SQL_USERNAME, SQL_PASSWORD, SQL_DATABASE);
+
+        if ($this->conn->connect_errno) {
+            // TODO: user-friendly error reporting
+            echo "Greška baze podataka: ", $this->conn->error, " #", 
+                $this->conn->errno;
             die;
         }
+    }
 
-        return $sqlConn;
+    public function execStmt(string $queryName = null, mixed ...$queryArgs)
+    {
+        $queryPair = self::SQL_QUERIES[$queryName];
+        $this->stmt = $this->conn->prepare($queryPair["query"]);
+        $this->stmt->bind_param($queryPair["types"], ...$queryArgs);
+        $this->stmt->execute();
     }
 
     public static function makeHash(string $raw) : string
     {
         return password_hash($raw, PASSWORD_BCRYPT);
+    }
+
+    public function __destruct()
+    {
+        $this->stmt->close();
+        $this->conn->close();
     }
 }
