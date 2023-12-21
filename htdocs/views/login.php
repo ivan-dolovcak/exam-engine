@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$user = User::ctorViaSessionVar();
+$user = User::ctorGetCurrentUser();
 // User has to be logged out to use this page. If not, redirect:
 if (isset($user))
     Util::redirect("/");

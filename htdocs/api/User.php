@@ -38,7 +38,7 @@ class User
      * @return User the current User object
      * @return null if user isn't logged in
      */
-    public static function ctorViaSessionVar() : ?self
+    public static function ctorGetCurrentUser() : ?self
     {
         if (isset($_SESSION["user"]))
             return unserialize($_SESSION["user"]);

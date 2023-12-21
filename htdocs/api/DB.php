@@ -56,9 +56,9 @@ class DB
      * Create and execute a prepared statement.
      * 
      * @param string $queryName     query's name in the `SQL_QUERIES` array
-     * @param array ...$queryArgs   args to bind to the statement query
+     * @param mixed ...$queryArgs   args to bind to the statement query
      */
-    public function execStmt(string $queryName, array ...$queryArgs) : void
+    public function execStmt(string $queryName, mixed ...$queryArgs) : void
     {
         $queryPair = self::SQL_QUERIES[$queryName];
         $this->stmt = $this->conn->prepare($queryPair["query"]);

@@ -1,8 +1,3 @@
-alter table `User`
-modify column `creationDate` date not null default utc_date();
+use `EXAM_ENGINE`;
 
-alter table `User`
-modify column `lastLoginDatetime` datetime not null default utc_timestamp();
-
-alter table `Document`
-modify column `creationDate` date not null default utc_date();
+rename table `Submittion` to `Submission`;

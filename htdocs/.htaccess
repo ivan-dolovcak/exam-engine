@@ -6,12 +6,12 @@ DirectoryIndex index.php index.html
     # This is the real path of the hosting service docroot, probably symlinked 
     # to /public_html:
     php_value auto_prepend_file \
-        /storage/ssd4/734/21605734/public_html/api/.common.php
+        /storage/ssd4/734/21605734/public_html/api/.ini.php
 
     <IfDefine DEVELOPMENT>
         # This is passed to PHP:
         SetEnv DEVELOPMENT "true"
-        php_value auto_prepend_file /srv/http/api/.common.php
+        php_value auto_prepend_file /srv/http/api/.ini.php
     </IfDefine>
 </IfModule>
 
