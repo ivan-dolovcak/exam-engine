@@ -25,7 +25,7 @@ class User
         $obj = new self();
         $obj->username = $username;
         $obj->email = $email;
-        $obj->passwordHash = DB::makeHash($password);
+        $obj->passwordHash = password_hash($password, PASSWORD_BCRYPT);
         $obj->firstName = $firstName;
         $obj->lastName = $lastName;
 
@@ -110,7 +110,7 @@ class User
         // Read all remaining attributes:
         $this->loadUser($userRow["ID"]);
 
-        if(! DB::checkHash($password, $this->passwordHash)) {
+        if(! password_verify($password, $this->passwordHash)) {
             $this->errMsg = "Greška: pogrešni podaci za prijavu.";
             return false;
         }

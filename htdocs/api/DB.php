@@ -67,29 +67,6 @@ class DB
     }
 
     /**
-     * Create an encrypted  of the string. This wrapper function exists if the
-     * encryption method changes in the future.
-     *
-     * @param string $raw       string to be encrypted
-     * @return string           encrypted string using `PASSWORD_BCRYPT`
-     */
-    public static function makeHash(string $raw) : string
-    {
-        return password_hash($raw, PASSWORD_BCRYPT);
-    }
-
-    /**
-     * Verify string against hash. This wrapper function exists if the
-     * encryption method changes in the future.
-     * 
-     * @return true if the hashes match, otherwise `false`
-     */
-    public static function checkHash(string $raw, string $hash) : bool
-    {
-        return password_verify($raw, $hash);
-    }
-
-    /**
      * Close statement and connection to database automatically when the object
      * is destroyed.
      */
