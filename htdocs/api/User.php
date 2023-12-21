@@ -1,4 +1,5 @@
 <?php
+/** User controller class. */
 class User
 {
     public int $ID;
@@ -9,10 +10,15 @@ class User
     public string $lastName;
     public DateTime $creationDate;
     public DateTime $lastLoginDatetime;
+    /** The error message from register/login process. */
     public ?string $errMsg;
     public const REGEX_USERNAME_CHECK = "/[^a-z_\.0-9]+/";
 
-
+    /**
+     * Prepare for user registration.
+     *
+     * 'login()' has to be called later for other attributes to be assigned.
+     */
     public static function ctorViaRegister(string $username, string $email, 
         string $password, string $firstName, string $lastName) : self
     {
@@ -26,6 +32,12 @@ class User
         return $obj;
     }
 
+    /**
+     * Get the current logged in User object by unserializing the session var.
+     * 
+     * @return User the current User object
+     * @return null if user isn't logged in
+     */
     public static function ctorViaSessionVar() : ?self
     {
         if (isset($_SESSION["user"]))
@@ -34,9 +46,15 @@ class User
             return null;
     }
 
+    /**
+     * Insert a new user into the database.
+     *
+     * @return false if registration failed (e.g. duplicate key), 'true'
+     * otherwise
+     */
     public function register() : bool
     {
-        // Check if username is legal:
+        // Check if username is legal
         if (preg_match(User::REGEX_USERNAME_CHECK, $this->username)) {
             $this->errMsg = "Greška: nedozvoljeni znakovi u korisničkom imenu";
             return false;
@@ -50,7 +68,7 @@ class User
             return true;
         }
         catch (mysqli_sql_exception $e) {
-            // Handle email/username duplicate:
+            // Handle email/username duplicates
             if (str_contains($e->getMessage(), "UK_Username"))
                 $this->errMsg = "Greška: korisničko ime '$this->username'"
                     . " je već zauzeto.";
@@ -64,6 +82,15 @@ class User
         }
     }
 
+    /**
+     * Login the user via username or email. 
+     * 
+     * If a user with specified login info is found, all attributes are loaded
+     * from the database into the object. The object is stored in a session
+     * variable.
+     * 
+     * @return true if logged in successfully, otherwise 'false'
+     */
     public function login(string $usernameOrEmail, string $password) : bool
     {
         $db = new DB();
@@ -83,12 +110,14 @@ class User
         // Read all remaining attributes:
         $this->loadUser($userRow["ID"]);
 
-        if(! password_verify($password, $this->passwordHash)) {
+        if(! DB::checkHash($password, $this->passwordHash)) {
             $this->errMsg = "Greška: pogrešni podaci za prijavu.";
             return false;
         }
 
-        // Save the User object in the session:
+        /* Save the User object in the session, instead of reading from the
+         * database every time User attributes are needed:
+         */
         $_SESSION["user"] = serialize($this);
 
         // Set/update login cookie (used for dynamic nav link):
@@ -97,6 +126,11 @@ class User
         return true;
     }
 
+    /**
+     * Load all User attributes from database into the object.
+     * 
+     * @param int $ID user ID (primary key)
+     */
     private function loadUser(int $ID) : void
     {
         $db = new DB();
