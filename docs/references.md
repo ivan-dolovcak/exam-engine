@@ -17,6 +17,7 @@ project development, which will be referenced in the thesis paper.
 - git docs: https://git-scm.com/doc
 - MariaDB docs: https://mariadb.com/kb/en/documentation/
 - GitHub docs: https://docs.github.com/en
+- PHPDoc: https://github.com/php-fig/fig-standards/blob/master/proposed/phpdoc.md
 
 
 ## Software used
@@ -36,6 +37,7 @@ project development, which will be referenced in the thesis paper.
 
 - Semantic Versioning: https://semver.org/
 - Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/
+- Linux coding style: https://github.com/torvalds/linux/blob/master/Documentation/process/coding-style.rst
 
 
 ## Web stack
