@@ -1,1 +1,2 @@
---exclude api/.sql_auth.php
+--exclude api/.sql_auth.php \
+--exclude-glob *.scss

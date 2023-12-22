@@ -1,0 +1,34 @@
+$color-fg: #C8C8C8;
+$color-bg: #0A0A0A;
+$color-accent: #3CE27C;
+$font-normal: sans-serif;
+$font-code: monospace;
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: $color-bg;
+    color: $color-fg;
+    font-family: $font-normal;
+}
+
+main {
+    height: 100%;
+}
+
+footer mark#version {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-family: $font-code;
+}
+
+input {
+    margin: 2px;
+}
+
+a {
+    color: $color-accent;
+}
