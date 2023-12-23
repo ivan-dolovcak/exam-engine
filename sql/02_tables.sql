@@ -24,21 +24,21 @@ create table `Document` (
     `authorID`            mediumint unsigned,
     `deadlineDatetime`    datetime,
     `creationDate`        date not null default utc_date(),
-    `documentJson`        json not null,
-    `solutionJson`        json,
+    `documentJSON`        json not null,
+    `solutionJSON`        json,
     primary key (`ID`),
     constraint `FK_DocumentAuthor`
         foreign key (`authorID`) references `User`(`ID`) 
         on delete set null
 );
 
-create table `Submittion` (
+create table `Submission` (
     `ID`                  mediumint unsigned not null auto_increment,
     `documentID`          mediumint unsigned not null,
     `userID`              mediumint unsigned not null,
     `datetimeStart`       datetime not null,
     `datetimeEnd`         datetime not null,
-    `submittionJson`      json not null,
+    `submissionJSON`      json not null,
     primary key (`ID`),
     constraint `FK_SubmissionDocument`
         foreign key (`documentID`) references `Document`(`ID`),
