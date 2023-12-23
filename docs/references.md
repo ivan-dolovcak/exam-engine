@@ -18,6 +18,8 @@ project development, which will be referenced in the thesis paper.
 - MariaDB docs: https://mariadb.com/kb/en/documentation/
 - GitHub docs: https://docs.github.com/en
 - PHPDoc: https://github.com/php-fig/fig-standards/blob/master/proposed/phpdoc.md
+- TypeScript docs: https://www.typescriptlang.org/docs/
+- Sass docs: https://sass-lang.com/documentation/
 
 
 ## Software used

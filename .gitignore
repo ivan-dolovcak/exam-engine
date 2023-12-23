@@ -1,2 +1,2 @@
-htdocs/.server/.auth.json
-htdocs/.server/.app_version
+htdocs/.app_version
+scripts/.ftp_auth.sh
