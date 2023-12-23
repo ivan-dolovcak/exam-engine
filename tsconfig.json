@@ -1,15 +1,12 @@
 {
     "compilerOptions": {
         "target": "es2016",
-        // Specify what module code is generated:
         "module": "commonjs",
         "rootDir": "htdocs",
         "emitBOM": false,
         "newLine": "lf",
-        // Ensure that casing is correct in imports:
-        "forceConsistentCasingInFileNames": true,
         "strict": true,
-        // Skip type checking all .d.ts files:
-        "skipLibCheck": true
+        "noImplicitAny": true,
+        "strictNullChecks": true,
     }
 }
