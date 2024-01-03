@@ -5,5 +5,4 @@ set -e # Exit on error
 appVersion="$(git show \
 	--no-patch --format="%(describe) (%ad)" --date="format:%Y-%m-%d %H:%M")"
 
-clientRoot="../htdocs"
-echo "$appVersion" > "$clientRoot/.app_version"
+echo "$appVersion" > htdocs/.app_version
