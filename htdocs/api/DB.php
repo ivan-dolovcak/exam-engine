@@ -32,6 +32,11 @@ class DB
                         where `ID`= ?;",
             "types" => "i"
         ],
+        "createDocument" => [
+            "query" => "insert into `Document`
+                        values (default, ?, ?, ?, ?, ?, default, null, null)",
+            "types" => "sssis"
+        ]
     ];
 
     public readonly mysqli $conn;
