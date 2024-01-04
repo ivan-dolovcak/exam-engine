@@ -2,15 +2,15 @@
 function getProfileLink(): string
 {
     if (isset($_SESSION["user"])) {
-        $url = "/views/profile.php";
+        $url = "/views/profile.phtml";
         $linkText = "Profil";
     }
     else if (isset($_COOKIE["exam_engine_login"])) {
-        $url = "/views/login.php";
+        $url = "/views/login.phtml";
         $linkText = "Prijava";
     }
     else {
-        $url = "/views/register.php";
+        $url = "/views/register.phtml";
         $linkText = "Registracija";
     }
 
@@ -21,7 +21,7 @@ function getProfileLink(): string
 <hr>
 
 <nav>
-    <a href="/views/home.php">Početna</a>
+    <a href="/views/home.phtml">Početna</a>
     <?php echo getProfileLink(); ?>
     <a href="/">O nama</a>
 </nav>

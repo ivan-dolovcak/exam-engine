@@ -9,11 +9,11 @@ if (isset($user))
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <?php require_once "head.php"; setPageTitle("Registracija"); ?>
+    <?php require_once "head.phtml"; setPageTitle("Registracija"); ?>
 </head>
 <body>
     <header>
-        <?php require_once "header.php"; ?>
+        <?php require_once "header.phtml"; ?>
     </header>
 
     <main>
@@ -42,11 +42,11 @@ if (isset($user))
             <?php echo Util::getFormMsg(); ?>
         </form>
 
-        <p>Imate račun? <a href="/views/login.php">Prijavite se</a></p>
+        <p>Imate račun? <a href="/views/login.phtml">Prijavite se</a></p>
     </main>
 
     <footer>
-        <?php require_once "footer.php"; ?>
+        <?php require_once "footer.phtml"; ?>
     </footer>
 </body>
 </html>

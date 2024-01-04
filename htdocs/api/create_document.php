@@ -22,5 +22,5 @@ if (isset($deadlineDate))
 $user = User::ctorGetCurrentUser();
 Document::create($name, $type, $passwordHash, $user->ID, $deadline);
 
-Util::redirect("/views/home.php");
+Util::redirect("/views/home.phtml");
 

@@ -4,16 +4,16 @@ session_start();
 $user = User::ctorGetCurrentUser();
 // User has to be logged in to use this page. If not, redirect:
 if (! isset($user))
-    Util::redirect("/views/login.php");
+    Util::redirect("/views/login.phtml");
 ?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <?php require_once "head.php"; setPageTitle("O nama"); ?>
+    <?php require_once "head.phtml"; setPageTitle("O nama"); ?>
 </head>
 <body>
     <header>
-        <?php require_once "header.php"; ?>
+        <?php require_once "header.phtml"; ?>
     </header>
 
     <main>
@@ -53,7 +53,7 @@ if (! isset($user))
     </main>
 
     <footer>
-        <?php require_once "footer.php"; ?>
+        <?php require_once "footer.phtml"; ?>
     </footer>
 </body>
 </html>

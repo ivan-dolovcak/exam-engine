@@ -1,4 +1,4 @@
-DirectoryIndex index.php index.html
+DirectoryIndex index.php index.phtml index.html
 
 # This is my workaround for getting a custom php.ini file (my hosting provider 
 # doesn't allow it):
@@ -15,9 +15,12 @@ DirectoryIndex index.php index.html
     </IfDefine>
 </IfModule>
 
-# Set default charset:
 <IfModule mod_mime.c>
     AddDefaultCharset utf-8
+    # Set .phtml files "executable"
+    # .phtml files mainly contain presentational HTML code, with a few lines of
+    # inline PHP which has to be executed:
+    AddType application/x-httpd-php .phtml
 </IfModule>
 
 # Deny dirs without an index page:

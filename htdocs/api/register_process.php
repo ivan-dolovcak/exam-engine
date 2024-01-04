@@ -16,7 +16,7 @@ $lastName = Util::sanitizeFormInput($_POST["lastName"]);
 // Check password confirm
 if ($password !== $passwordConfirm) {
     $_SESSION["formMsg"] = "Greška: lozinke se ne podudaraju.";
-    Util::redirect("/views/register.php");
+    Util::redirect("/views/register.phtml");
 }
 
 $user = User::ctorViaRegister(
@@ -24,8 +24,8 @@ $user = User::ctorViaRegister(
 if (! $user->register()) {
     // In case of registration error, show form again with error message
     $_SESSION["formMsg"] = $user->errMsg;
-    Util::redirect("/views/register.php");
+    Util::redirect("/views/register.phtml");
 }
     
 $user->login($username, $password);
-Util::redirect("/views/home.php");
+Util::redirect("/views/home.phtml");
