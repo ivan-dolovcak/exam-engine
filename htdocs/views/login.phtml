@@ -20,10 +20,10 @@ if (isset($_SESSION["userID"]))
         
         <form action="/api/login_process.php" method="post">
             <label for="emailOrPassword">E-mail ili korisničko ime</label>
-            <input type="text" name="emailOrPassword">
+            <input required type="text" name="emailOrPassword">
             <br>
             <label for="password">Lozinka</label>
-            <input type="password" name="password">
+            <input required type="password" name="password">
             <br>
             <input type="submit" value="Prijavi me">
             <?php echo Util::getFormMsg(); ?>
