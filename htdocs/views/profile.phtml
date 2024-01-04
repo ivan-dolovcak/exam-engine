@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-$user = User::ctorGetCurrentUser();
 // User has to be logged in to use this page. If not, redirect:
-if (! isset($user))
+if (! isset($_SESSION["userID"]))
     Util::redirect("/");
 ?>
 <!DOCTYPE html>
@@ -20,7 +19,9 @@ if (! isset($user))
         <h2>Profil</h2>
         
 <?php
-    echo "<p>Dobro došli, ", $user->firstName, " ", $user->lastName, "!</p>";
+    $user = User::load($_SESSION["userID"]);
+
+    echo "<p>Dobro došli, ", $user["firstName"], " ", $user["lastName"], "!</p>";
     
     echo "<ul>";
     foreach ($user as $key => $value) {

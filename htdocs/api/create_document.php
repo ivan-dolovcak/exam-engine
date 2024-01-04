@@ -19,8 +19,6 @@ if (isset($deadlineDate))
     $deadline = $deadlineDate . "T" . $deadlineTime ?: "00:00";
 
 // Insert into DB and redirect
-$user = User::ctorGetCurrentUser();
-Document::create($name, $type, $passwordHash, $user->ID, $deadline);
+Document::create($name, $type, $passwordHash, $_SESSION["userID"], $deadline);
 
 Util::redirect("/views/home.phtml");
-

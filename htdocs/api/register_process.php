@@ -19,13 +19,9 @@ if ($password !== $passwordConfirm) {
     Util::redirect("/views/register.phtml");
 }
 
-$user = User::ctorViaRegister(
-    $username, $email, $password, $firstName, $lastName);
-if (! $user->register()) {
-    // In case of registration error, show form again with error message
-    $_SESSION["formMsg"] = $user->errMsg;
+if (! User::register($username, $email, $password, $firstName, $lastName)) {
+    // In case of registration error, show form again with error message:
     Util::redirect("/views/register.phtml");
 }
     
-$user->login($username, $password);
 Util::redirect("/views/home.phtml");

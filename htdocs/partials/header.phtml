@@ -1,7 +1,7 @@
 <?php
 function getProfileLink(): string
 {
-    if (isset($_SESSION["user"])) {
+    if (isset($_SESSION["userID"])) {
         $url = "/views/profile.phtml";
         $linkText = "Profil";
     }

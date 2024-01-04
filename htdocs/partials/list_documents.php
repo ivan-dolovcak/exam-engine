@@ -1,7 +1,7 @@
 <?php
 
 $db = new DB();
-$db->execStmt("loadDocumentsMetadata", $user->ID);
+$db->execStmt("loadDocumentsMetadata", $_SESSION["userID"]);
 $sqlResult = $db->stmt->get_result();
 $documents = $sqlResult->fetch_all(MYSQLI_ASSOC);
 

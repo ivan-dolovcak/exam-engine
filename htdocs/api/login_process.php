@@ -9,10 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST")
 $emailOrPassword = Util::sanitizeFormInput($_POST["emailOrPassword"]);
 $password = Util::sanitizeFormInput($_POST["password"]);
 
-$user = new User();
-if (! $user->login($emailOrPassword, $password))
-    // In case of login error, show form again with error message
-    $_SESSION["formMsg"] = $user->errMsg;
+if (! User::login($emailOrPassword, $password))
+    // In case of login error, show form again with error message:
     Util::redirect("/views/login.phtml");
 
 Util::redirect("/views/home.phtml");
