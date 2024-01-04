@@ -36,6 +36,13 @@ class DB
             "query" => "insert into `Document`
                         values (default, ?, ?, ?, ?, ?, default, null, null)",
             "types" => "sssis"
+        ],
+        "loadDocumentsMetadata" => [
+            "query" => "select `ID`, `name`, `type`, `passwordHash`, `authorID`, 
+                            `deadlineDatetime`, `creationDate`
+                        from `Document`
+                        where `authorID` = ?",
+            "types" => "i"
         ]
     ];
 

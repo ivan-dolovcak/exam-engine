@@ -34,7 +34,12 @@ a {
 }
 
 form {
+    display: inline-block;
     border: 1px solid;
     padding: 10px;
-    display: inline-block;
+}
+
+div.document-box {
+    width: fit-content;
+    border: 1px solid $color-accent;
 }

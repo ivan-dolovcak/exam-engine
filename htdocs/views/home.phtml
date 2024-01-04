@@ -9,7 +9,7 @@ if (! isset($user))
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <?php require_once "head.phtml"; setPageTitle("O nama"); ?>
+    <?php require_once "head.phtml"; setPageTitle("Početna"); ?>
 </head>
 <body>
     <header>
@@ -19,7 +19,7 @@ if (! isset($user))
     <main>
         <h2>Moji dokumenti</h2>
         
-        <p>...</p>
+        <?php require_once "list_documents.php" ?>
 
         <h3>Napravi novi dokument</h3>
 
