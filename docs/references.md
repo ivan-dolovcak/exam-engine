@@ -20,7 +20,7 @@ project development, which will be referenced in the thesis paper.
 - PHPDoc: https://github.com/php-fig/fig-standards/blob/master/proposed/phpdoc.md
 - TypeScript docs: https://www.typescriptlang.org/docs/
 - Sass docs: https://sass-lang.com/documentation/
-
+- Python stdlib docs: https://docs.python.org/3/library/
 
 ## Software used
 
@@ -59,4 +59,5 @@ project development, which will be referenced in the thesis paper.
 - PHP
 - TypeScript
 - Unix shell
+- Python
 - SQL (MariaDB)
