@@ -55,4 +55,17 @@ class Util
         
         return $input;
     }
+
+    public static function obfuscateID(int $ID) : string
+    {
+        srand($ID);
+        $key = rand(1000, 9999);
+        return $key . dechex($ID ^ $key);
+    }
+    
+    public static function deobfuscateID(string $obfuscatedID) : int
+    {
+        $key = intval(substr($obfuscatedID, 0, 4));
+        return hexdec(substr($obfuscatedID, 4)) ^ $key;
+    }
 }
