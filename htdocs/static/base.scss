@@ -6,7 +6,7 @@ $font-code: monospace;
 
 body {
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background: $color-bg;
@@ -19,7 +19,7 @@ main {
 }
 
 footer mark#version {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
     font-family: $font-code;
