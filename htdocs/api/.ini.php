@@ -14,8 +14,9 @@ date_default_timezone_set("UTC");
 
 set_include_path(implode(":", array(
     $_SERVER["DOCUMENT_ROOT"] . "/partials",
-    $_SERVER["DOCUMENT_ROOT"] . "/api"),
-));
+    $_SERVER["DOCUMENT_ROOT"] . "/api",
+    $_SERVER["DOCUMENT_ROOT"] . "/api/controllers",
+)));
 
 /* Auto-require class definitions.
  * "require" used instead of "require_once" because "sql_auto_register" already
