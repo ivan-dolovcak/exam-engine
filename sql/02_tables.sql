@@ -24,7 +24,7 @@ create table `Document` (
     `authorID`            mediumint unsigned,
     `deadlineDatetime`    datetime,
     `creationDate`        date not null default utc_date(),
-    `documentJSON`        json not null,
+    `documentJSON`        json,
     `solutionJSON`        json,
     primary key (`ID`),
     constraint `FK_DocumentAuthor`
