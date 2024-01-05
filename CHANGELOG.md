@@ -1,6 +1,17 @@
 # Changelog
 
 
+# v0.3.1 (2024-01-05)
+
+- added ID obfuscation in GET URL's
+- translated the publishing script to Python and moved it in its own repo
+- add basic form & logic for inserting a document into db
+- create document listing for current user on homepage
+- user logic: now only the user ID is stored, not the whole serialized object
+- minor file/folder renaming
+- minor CSS changes
+
+
 # v0.3.0 (2023-12-23)
 
 - project folder restructuring & renaming
@@ -45,12 +56,12 @@
 
 ## v0.1.0 (2023-12-06)
 
-This is the intiial version. Everything is ready for web app development (the 
+This is the initial version. Everything is ready for web app development (the 
 workspace, scripts and configs are set up).
 
-- Add Apache and PHP config
-- Add SQL authorization info
-- Workspace: differentiate local vs server environment
-- Add SQL table definitions
-- Show version/tag on website
-- Add basic testing HTML & CSS
+- add Apache and PHP config
+- add SQL authorization info
+- workspace: differentiate local vs server environment
+- add SQL table definitions
+- show version/tag on website
+- add basic testing HTML & CSS
