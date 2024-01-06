@@ -50,6 +50,11 @@ class DB
                         where `ID` = ?",
             "types" => "i"
         ],
+        "createSubmission" => [
+            "query" => "insert into `Submission`
+                        values (default, ?, ?, ?, default, ?)",
+            "types" => "iiss"
+        ]
     ];
 
     public readonly mysqli $conn;

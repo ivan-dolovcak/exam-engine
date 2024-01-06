@@ -10,8 +10,6 @@ interface QuestionData
     height?: number,
 }
 
-let fillInCount: number = 0;
-
 function generateQuestion(question: QuestionData) : HTMLDivElement
 {
     const questionBox: HTMLDivElement = document.createElement("div");
@@ -27,13 +25,10 @@ function generateQuestion(question: QuestionData) : HTMLDivElement
     switch (question.type) {
     case "fillIn":
         const partialText: HTMLParagraphElement = document.createElement("p");
-        console.log(question.partialText);
         question.partialText
             = question.partialText?.replace(/\u200E/g, (match: string) => {
-                return `<input id="${question.id}-${fillInCount++}">`;
-            });
-        fillInCount = 0;
-        console.log(question.partialText);
+                return `<input name=${question.id}[]>`;
+            })
         
         partialText.innerHTML = question.partialText ?? "";
         answerArea.appendChild(partialText);
@@ -63,7 +58,7 @@ function generateQuestion(question: QuestionData) : HTMLDivElement
         question.answers?.forEach(answer => {
             const radio: HTMLInputElement = document.createElement("input");
             radio.type = question.type === "multiChoice" ? "checkbox" : "radio";
-            radio.name = question.id.toString();
+            radio.name = question.id.toString() + "[]";
             radio.id = question.id.toString() + Math.floor(Math.random() * 10000);
             radio.value = answer;
             answerArea.appendChild(radio);

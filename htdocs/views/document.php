@@ -10,6 +10,11 @@ if (! isset($_GET["ID"]))
 
 $documentID = Util::deobfuscateID($_GET["ID"]);
 
+// Store start time
+if (! isset($_SESSION["datetimeStart_$documentID"]))
+    $_SESSION["datetimeStart_$documentID"] = date("Y-m-d H:i:s");
+
+$documentFormAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 $documentJSON = Document::loadJSON($documentID);
 ?>
 <!DOCTYPE html>
@@ -25,7 +30,8 @@ $documentJSON = Document::loadJSON($documentID);
     </header>
 
     <main id="main">
-        <form id="questions-box" method="post" action="/api/submit_answers.php">
+        <form id="questions-box" method="post" 
+            action="<?php echo $documentFormAction; ?>">
             <script defer>generateDocument(<?php echo $documentJSON; ?>)</script>
 
             <input type="submit" value="Predaj ispit" id="submit">

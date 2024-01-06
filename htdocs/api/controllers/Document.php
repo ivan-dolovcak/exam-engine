@@ -13,6 +13,8 @@ class Document
         catch (mysqli_sql_exception $e) {
             $_SESSION["formMsg"] = "Greška baze podataka: " . $e->getMessage() 
             . $e->getCode();
+
+            return false;
         }
 
         return true;
