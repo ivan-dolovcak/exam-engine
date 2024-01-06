@@ -54,7 +54,15 @@ class DB
             "query" => "insert into `Submission`
                         values (default, ?, ?, ?, default, ?)",
             "types" => "iiss"
-        ]
+        ],
+        "loadSubmissionsMetadata" => [
+            "query" => "select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
+                        from `Submission` as s
+                        join `Document` as d
+                        on d.`ID` = `documentID`
+                        where `userID` = ?",
+            "types" => "i"
+        ],
     ];
 
     public readonly mysqli $conn;
