@@ -43,7 +43,13 @@ class DB
                         from `Document`
                         where `authorID` = ?",
             "types" => "i"
-        ]
+        ],
+        "loadDocumentContent" => [
+            "query" => "select `documentJSON`
+                        from `Document`
+                        where `ID` = ?",
+            "types" => "i"
+        ],
     ];
 
     public readonly mysqli $conn;

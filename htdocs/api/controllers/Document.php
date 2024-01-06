@@ -17,4 +17,15 @@ class Document
 
         return true;
     }
+
+    public static function loadJSON(int $ID) : string
+    {
+        $db = new DB();
+
+        $db->execStmt("loadDocumentContent", $ID);
+        $sqlResult = $db->stmt->get_result();
+        $json = $sqlResult->fetch_array();
+
+        return json_encode($json[0]);
+    }
 }

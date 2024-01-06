@@ -43,3 +43,28 @@ div.document-box {
     width: fit-content;
     border: 1px solid $color-accent;
 }
+
+main#main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+form#questions-box{
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    gap: .5rem;
+    & > div {
+        border: 1px solid darken($color-accent, 30%);
+        h4 {
+            color: $color-accent;
+            margin: 0 .2rem 0;
+        }
+    }
+    input#submit {
+        order: 10000;
+        width: fit-content;
+    }
+}
+    
