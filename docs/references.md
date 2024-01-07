@@ -22,6 +22,7 @@ project development, which will be referenced in the thesis paper.
 - Sass docs: https://sass-lang.com/documentation/
 - Python stdlib docs: https://docs.python.org/3/library/
 
+
 ## Software used
 
 - OS: Arch Linux: https://archlinux.org/

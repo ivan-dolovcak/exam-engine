@@ -12,9 +12,9 @@ class User
      * otherwise
      */
     public static function register(string $username, string $email, 
-        string $password, string $firstName, string $lastName) : bool
+        string $password, string $firstName, string $lastName): bool
     {
-        // Check if username is legal
+        // Check if username is legal.
         if (preg_match(User::REGEX_USERNAME_CHECK, $username)) {
             $_SESSION["formMsg"] 
                 = "Greška: nedozvoljeni znakovi u korisničkom imenu";
@@ -29,7 +29,7 @@ class User
                 $firstName, $lastName);
         }
         catch (mysqli_sql_exception $e) {
-            // Handle email/username duplicates
+            // Handle email/username duplicates.
             if (str_contains($e->getMessage(), "UK_Username"))
                 $_SESSION["formMsg"] = "Greška: korisničko ime '$username'"
                     . " je već zauzeto.";
@@ -42,7 +42,7 @@ class User
             return false;
         }
 
-        // Load user ID:
+        // Load user ID, touch last login timestamp:
         self::login($username, $password);
         return true;
     }
@@ -52,7 +52,8 @@ class User
      * 
      * @return true if logged in successfully, otherwise 'false'
      */
-    public static function login(string $usernameOrEmail, string $password) : bool
+    public static function login(string $usernameOrEmail, string $password)
+        : bool
     {
         $db = new DB();
         $db->execStmt("login", $usernameOrEmail, $usernameOrEmail);
@@ -83,7 +84,7 @@ class User
     /**
      * Load a user record from DB.
      */
-    public static function load(int $ID) : array
+    public static function load(int $ID): array
     {
         $db = new DB();
         $db->execStmt("loadUser", $ID);

@@ -6,21 +6,21 @@ class Util
     private function __construct() { }
 
     /** Send a redirect header and end the script. */
-    public static function redirect(string $url) : void
+    public static function redirect(string $url): void
     {
         header("Location: $url");
         die;
     }
 
     /** Go to previous page by echoing JS. */
-    public static function previousPage() : void
+    public static function previousPage(): void
     {
         echo "<script>history.back();</script>";
         die;
     }
 
     /** Get form error message and delete it on page refresh. */
-    public static function getFormMsg() : string
+    public static function getFormMsg(): string
     {
         $formMsg = isset($_SESSION["formMsg"]) ? $_SESSION["formMsg"] : "";
 
@@ -31,7 +31,7 @@ class Util
     }
 
     /** Read the app version from a file. */
-    public static function getAppVersion() : string
+    public static function getAppVersion(): string
     {
         $versionFile = $_SERVER["DOCUMENT_ROOT"] . "/.app_version";
 
@@ -47,7 +47,7 @@ class Util
      * @param string $input     raw form input
      * @return string           sanitized string
      */
-    public static function sanitizeFormInput(string $input) : string
+    public static function sanitizeFormInput(string $input): string
     {
         $input = trim($input);
         $input = stripslashes($input);
@@ -56,14 +56,14 @@ class Util
         return $input;
     }
 
-    public static function obfuscateID(int $ID) : string
+    public static function obfuscateID(int $ID): string
     {
         srand($ID);
         $key = rand(1000, 9999);
         return $key . dechex($ID ^ $key);
     }
     
-    public static function deobfuscateID(string $obfuscatedID) : int
+    public static function deobfuscateID(string $obfuscatedID): int
     {
         $key = intval(substr($obfuscatedID, 0, 4));
         return hexdec(substr($obfuscatedID, 4)) ^ $key;

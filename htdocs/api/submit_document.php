@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Only allow POST requests
+// Only allow POST requests.
 if ($_SERVER["REQUEST_METHOD"] !== "POST")
     Util::previousPage();
 

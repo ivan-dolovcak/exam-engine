@@ -1,5 +1,4 @@
 <?php
-
 $db = new DB();
 $db->execStmt("loadDocumentsMetadata", $_SESSION["userID"]);
 $sqlResult = $db->stmt->get_result();
@@ -8,7 +7,7 @@ $documents = $sqlResult->fetch_all(MYSQLI_ASSOC);
 if (empty($documents))
     echo "<p>Nema dokumenta.</p>";
 
-foreach($documents as $document) {
+foreach ($documents as $document) {
     echo "<div class='document-box'>";
     $type = $document["type"] == "exam" ? "ispit" : "obrazac"; 
     echo "<h4>{$document["name"]} [$type]</h4>";

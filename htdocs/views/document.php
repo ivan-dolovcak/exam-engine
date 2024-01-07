@@ -9,7 +9,7 @@ if (! isset($_GET["ID"]))
     Util::redirect("/views/home.phtml");
 
 $documentID = Util::deobfuscateID($_GET["ID"]);
-// for passing the document JSON to JS:
+// For passing the document JSON to JS:
 if (isset($_GET["loadDocumentContent"])) {
     $documentJSON = Document::loadJSON($documentID);
     echo $documentJSON;

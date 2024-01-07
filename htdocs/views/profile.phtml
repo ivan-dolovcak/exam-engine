@@ -21,15 +21,11 @@ if (! isset($_SESSION["userID"]))
 <?php
     $user = User::load($_SESSION["userID"]);
 
-    echo "<p>Dobro došli, ", $user["firstName"], " ", $user["lastName"], "!</p>";
+    echo "<p>Dobro došli, {$user["firstName"]} {$user["lastName"]}!</p>";
     
     echo "<ul>";
-    foreach ($user as $key => $value) {
-        if ($value instanceof DateTime)
-            $value = $value->format("Y/m/d H:i:s");
-
-        echo "<li>", $key, " => ", $value, "</li>";
-    }
+    foreach ($user as $key => $value)
+        echo "<li>$key => $value</li>";
         
     echo "</ul>";
 ?>

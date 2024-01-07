@@ -58,7 +58,7 @@ class DB
         "loadSubmissionsMetadata" => [
             "query" => "select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
                         from `Submission` as s
-                        join `Document` as d
+                        inner join `Document` as d
                         on d.`ID` = `documentID`
                         where `userID` = ?",
             "types" => "i"
@@ -68,6 +68,7 @@ class DB
     public readonly mysqli $conn;
     // Using prepared statements as basic protection against SQL injection:
     public readonly mysqli_stmt $stmt;
+    
     
     /** Create a connection to the database. */
     public function __construct()
@@ -89,7 +90,7 @@ class DB
      * @param string $queryName     query's name in the `SQL_QUERIES` array
      * @param mixed ...$queryArgs   args to bind to the statement query
      */
-    public function execStmt(string $queryName, mixed ...$queryArgs) : void
+    public function execStmt(string $queryName, mixed ...$queryArgs): void
     {
         $queryPair = self::SQL_QUERIES[$queryName];
         $this->stmt = $this->conn->prepare($queryPair["query"]);

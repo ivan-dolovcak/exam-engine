@@ -1,3 +1,4 @@
+/** Question object extracted from the document JSON. */
 interface QuestionData
 {
     id: number,
@@ -10,7 +11,7 @@ interface QuestionData
     height?: number,
 }
 
-function generateQuestion(question: QuestionData) : HTMLDivElement
+function generateQuestionElement(question: QuestionData): HTMLDivElement
 {
     const questionBox: HTMLDivElement = document.createElement("div");
     questionBox.style.order = question.ordinal.toString();
@@ -59,7 +60,8 @@ function generateQuestion(question: QuestionData) : HTMLDivElement
             const radio: HTMLInputElement = document.createElement("input");
             radio.type = question.type === "multiChoice" ? "checkbox" : "radio";
             radio.name = question.id.toString() + "[]";
-            radio.id = question.id.toString() + Math.floor(Math.random() * 10000);
+            radio.id
+                = question.id.toString() + Math.floor(Math.random() * 10000);
             radio.value = answer;
             answerArea.appendChild(radio);
 
@@ -79,13 +81,13 @@ async function fetchDocument(): Promise<any> {
     return await response.json();
 }
 
-async function generateDocument() : Promise<void>
+async function generateDocument(): Promise<void>
 {
     const questionsBox
         = document.getElementById("questions-box") as HTMLFormElement | null;
     
     const questions: QuestionData[] = JSON.parse(await fetchDocument());
     questions.forEach(question => {
-        questionsBox?.appendChild(generateQuestion(question));
+        questionsBox?.appendChild(generateQuestionElement(question));
     });
 }
