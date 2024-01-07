@@ -73,13 +73,18 @@ function generateQuestion(question: QuestionData) : HTMLDivElement
     return questionBox;
 }
 
-function generateDocument(json: string) : void
-{
-    const questions: QuestionData[] = JSON.parse(json);
+async function fetchDocument(): Promise<any> {
+    // for passing the document from PHP to JS (loadDocumentContent in GET):
+    const response = await fetch(`${window.location.href}&loadDocumentContent`);
+    return await response.json();
+}
 
+async function generateDocument() : Promise<void>
+{
     const questionsBox
         = document.getElementById("questions-box") as HTMLFormElement | null;
-
+    
+    const questions: QuestionData[] = JSON.parse(await fetchDocument());
     questions.forEach(question => {
         questionsBox?.appendChild(generateQuestion(question));
     });

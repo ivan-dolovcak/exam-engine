@@ -4,6 +4,7 @@
         "module": "commonjs",
         "rootDir": "htdocs",
         "emitBOM": false,
+        "removeComments": true,
         "newLine": "lf",
         "strict": true,
         "noImplicitAny": true,

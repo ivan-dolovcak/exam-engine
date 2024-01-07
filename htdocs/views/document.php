@@ -9,13 +9,14 @@ if (! isset($_GET["ID"]))
     Util::redirect("/views/home.phtml");
 
 $documentID = Util::deobfuscateID($_GET["ID"]);
+// for passing the document JSON to JS:
+if (isset($_GET["loadDocumentContent"])) {
+    $documentJSON = Document::loadJSON($documentID);
+    echo $documentJSON;
+    die;
+}
 
-// Store start time
-if (! isset($_SESSION["datetimeStart_$documentID"]))
-    $_SESSION["datetimeStart_$documentID"] = date("Y-m-d H:i:s");
-
-$documentFormAction = "/api/submit_document.php?ID={$_GET["ID"]}";
-$documentJSON = Document::loadJSON($documentID);
+$formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 ?>
 <!DOCTYPE html>
 <html lang="hr">
@@ -31,8 +32,8 @@ $documentJSON = Document::loadJSON($documentID);
 
     <main id="main">
         <form id="questions-box" method="post" 
-            action="<?php echo $documentFormAction; ?>">
-            <script defer>generateDocument(<?php echo $documentJSON; ?>)</script>
+            action="<?php echo $formAction; ?>">
+            <script defer>generateDocument();</script>
 
             <input type="submit" value="Predaj ispit" id="submit">
         </form>
