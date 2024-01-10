@@ -17,12 +17,14 @@ if (isset($_GET["loadDocumentContent"])) {
 }
 
 $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
+
 ?>
 <!DOCTYPE html>
 <html lang="hr">
 <head>
     <?php require_once "head.phtml"; setPageTitle("Pregled dokumenta"); ?>
-
+    
+    <?php require_once "{$_SERVER["DOCUMENT_ROOT"]}/partials/question_template.html"; ?>
     <script src="/api/generate_document.js"></script>
 </head>
 <body>
@@ -31,9 +33,8 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
     </header>
 
     <main id="main">
-        <form id="questions-box" method="post" 
-            action="<?php echo $formAction; ?>">
-            <script defer>generateDocument();</script>
+        <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
+            <script>generateDocument();</script>
 
             <input type="submit" value="Predaj ispit" id="submit">
         </form>
