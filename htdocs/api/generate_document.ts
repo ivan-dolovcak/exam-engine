@@ -14,9 +14,8 @@ let questions: IQuestionData[];
 
 abstract class QuestionElement extends HTMLDivElement
 {
-    questionJSONData: IQuestionData;
-    inputsDiv: HTMLDivElement
-    abstract readonly answer: string | string[] | number | null;
+    protected questionJSONData: IQuestionData;
+    protected inputsDiv: HTMLDivElement
 
 
     set headerTitle(title: string)
@@ -46,6 +45,7 @@ abstract class QuestionElement extends HTMLDivElement
             "question-template") as HTMLTemplateElement;
         const questionHTML: DocumentFragment = questionTemplate.content;
         this.appendChild(questionHTML.cloneNode(true));
+        this.classList.add("question");
 
         this.inputsDiv
             = this.getElementsByClassName("inputs")[0] as HTMLDivElement;
@@ -57,32 +57,23 @@ abstract class QuestionElement extends HTMLDivElement
 
 class ShortAnswer extends QuestionElement
 {
-    input: HTMLInputElement;
+    private input: HTMLInputElement;
 
-    get answer()
-    {
-        const answer = this.input.value.trim()
-        return answer ? answer : null;
-    }
 
     constructor(questionJSONData: IQuestionData)
     {
         super(questionJSONData);
 
         this.input = document.createElement("input");
+        this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
 }
 
 class LongAnswer extends QuestionElement
 {
-    input: HTMLTextAreaElement;
+    private input: HTMLTextAreaElement;
 
-    get answer()
-    {
-        const answer = this.input.value.trim()
-        return answer ? answer : null;
-    }
 
     constructor(questionJSONData: IQuestionData)
     {
@@ -91,32 +82,13 @@ class LongAnswer extends QuestionElement
         this.input = document.createElement("textarea");
         this.input.rows = this.questionJSONData.size![0];
         this.input.cols = this.questionJSONData.size![1]!;
+        this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
 }
 
 class MultiChoice extends QuestionElement
 {
-    get answer()
-    {
-        let answers: string[] = [];
-
-        const radioBtns
-            = this.inputsDiv.children as HTMLCollectionOf<HTMLInputElement>;
-        for (const radioBtn of radioBtns) {
-            if (radioBtn.checked)
-                answers.push(radioBtn.value);
-        }
-
-        if (answers.length === 0)
-            return null;
-
-        if (this.questionJSONData.type === "multiChoice")
-            return answers;
-        else
-            return answers[0];
-    }
-
     constructor(questionJSONData: IQuestionData)
     {
         super(questionJSONData);
@@ -129,10 +101,18 @@ class MultiChoice extends QuestionElement
 
         for (const offeredAnswer of offeredAnswers) {
             const radioBtn = document.createElement("input");
-            radioBtn.type = this.questionJSONData.type === "multiChoice" ? "checkbox" : "radio";
-            radioBtn.name = this.questionJSONData.id.toString();
-            radioBtn.id = this.questionJSONData.id.toString() + Math.floor(Math.random() * 1000);
+
+            // The only difference for multiChoice is to use checkboxes:
+            if (this.questionJSONData.type === "multiChoice")
+                radioBtn.type = "checkbox";
+            else
+                radioBtn.type = "radio";
+        
             radioBtn.value = offeredAnswer;
+            radioBtn.name = this.questionJSONData.id.toString();
+            const randomID: number = Math.floor(Math.random() * 1000);
+            radioBtn.id = this.questionJSONData.id.toString() + randomID;
+
             this.inputsDiv.appendChild(radioBtn);
 
             const radioLabel = document.createElement("label");
@@ -145,31 +125,17 @@ class MultiChoice extends QuestionElement
 
 class FillIn extends QuestionElement
 {
-    get answer()
-    {
-        let answers: string[] = [];
-        for (const input of this.inputsDiv.getElementsByTagName("input")) {
-            answers.push(input.value.trim());
-        }
-
-        if (answers.length === 0)
-            return null;
-        else
-            return answers;
-    }
-
     constructor(questionJSONData: IQuestionData)
     {
         super(questionJSONData);
 
         const partialText = document.createElement("p");
         partialText.innerText = this.questionJSONData.partialText!;
-        partialText.innerHTML
-            = partialText.innerHTML.replace(/\u200e/g, "<input>");
+        partialText.innerHTML = partialText.innerHTML.replace(
+            /\u200e/g, `<input name="${this.questionJSONData.id}">`);
         
         this.inputsDiv.appendChild(partialText);
     }
-
 }
 
 function generateQuestionElement(question: IQuestionData)
@@ -194,9 +160,9 @@ function generateQuestionElement(question: IQuestionData)
     return questionElement;
 }
 
-async function fetchDocumentJSON() : Promise<any>
+async function fetchDocumentJSON(): Promise<any>
 {
-    // for passing the document from PHP to JS (loadDocumentContent in GET):
+    // For passing the document from PHP to JS (loadDocumentContent in GET):
     const response = await fetch(`${window.location.href}&loadDocumentContent`);
     const json = await response.json();
     return JSON.parse(json);
@@ -222,4 +188,35 @@ async function generateDocument(): Promise<any>
 
         questionsBox?.appendChild(questionElement);
     }    
+}
+
+type IAnswers = {
+    [key: string]: string | string[]
+};
+
+function saveAnswers(): void
+{
+    const formData: FormData = new FormData(document.forms[0]);
+    let formDataJSON: IAnswers = {};
+    
+    for (let [key, value] of formData.entries())
+    {
+        // Don't store unanswered questions:
+        if (! value.toString().trim())
+            continue;
+    
+        // Handle inputs with multiple values (e.g. checkboxes).
+        if(! Reflect.has(formDataJSON, key)){
+            formDataJSON[key] = value.toString();
+            continue;
+        }
+        // If key already exists, convert it into an array.
+        if(! Array.isArray(formDataJSON[key])){
+            formDataJSON[key] = [formDataJSON[key]] as string[];
+            (formDataJSON[key] as string[]).push(value.toString());
+        }
+    }
+    
+    localStorage.setItem("123123", JSON.stringify(formDataJSON));
+    console.log("Saved document answers locally.");
 }
