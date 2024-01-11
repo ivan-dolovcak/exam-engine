@@ -53,6 +53,15 @@ abstract class QuestionElement extends HTMLDivElement
         this.headerTitle = this.questionJSONData.title;
         this.ordinal = this.questionJSONData.ordinal;
     }
+
+    connectedCallback()
+    {
+        const inputs: NodeListOf<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>
+            = this.inputsDiv.querySelectorAll("input, textarea, select");
+        
+        for (const input of inputs)
+            input.addEventListener("blur", saveAnswers);
+    }
 }
 
 class ShortAnswer extends QuestionElement
@@ -132,7 +141,7 @@ class FillIn extends QuestionElement
         const partialText = document.createElement("p");
         partialText.innerText = this.questionJSONData.partialText!;
         partialText.innerHTML = partialText.innerHTML.replace(
-            /\u200e/g, `<input name="${this.questionJSONData.id}">`);
+            /\u200e/g, `<input name="${this.questionJSONData.id}?">`);
         
         this.inputsDiv.appendChild(partialText);
     }
@@ -201,19 +210,21 @@ function saveAnswers(): void
     
     for (let [key, value] of formData.entries())
     {
-        // Don't store unanswered questions:
-        if (! value.toString().trim())
+        value = value.toString().trim();
+        // Don't store unanswered questions, except for FillIn type to preserve
+        // order of answers (their name ends with a ?):
+        if (! value && ! key.endsWith("?"))
             continue;
     
         // Handle inputs with multiple values (e.g. checkboxes).
         if(! Reflect.has(formDataJSON, key)){
-            formDataJSON[key] = value.toString();
+            formDataJSON[key] = value;
             continue;
         }
         // If key already exists, convert it into an array.
         if(! Array.isArray(formDataJSON[key])){
             formDataJSON[key] = [formDataJSON[key]] as string[];
-            (formDataJSON[key] as string[]).push(value.toString());
+            (formDataJSON[key] as string[]).push(value);
         }
     }
     
