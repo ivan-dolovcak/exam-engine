@@ -74,6 +74,7 @@ class ShortAnswer extends QuestionElement
         super(questionJSONData);
 
         this.input = document.createElement("input");
+        this.input.type = "text";
         this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
@@ -109,25 +110,28 @@ class MultiChoice extends QuestionElement
             offeredAnswers = this.questionJSONData.answers!;
 
         for (const offeredAnswer of offeredAnswers) {
-            const radioBtn = document.createElement("input");
+            const radioContainer = document.createElement("label");
+            radioContainer.classList.add("multi-container");
+            radioContainer.innerText = offeredAnswer;
+            const randomID: number = Math.floor(Math.random() * 1000);
+            radioContainer.htmlFor = this.questionJSONData.id.toString() + randomID;
+            this.inputsDiv.appendChild(radioContainer);
 
+            const radioBtn = document.createElement("input");
             // The only difference for multiChoice is to use checkboxes:
             if (this.questionJSONData.type === "multiChoice")
                 radioBtn.type = "checkbox";
             else
                 radioBtn.type = "radio";
-        
+
             radioBtn.value = offeredAnswer;
             radioBtn.name = this.questionJSONData.id.toString();
-            const randomID: number = Math.floor(Math.random() * 1000);
-            radioBtn.id = this.questionJSONData.id.toString() + randomID;
+            radioBtn.id = radioContainer.htmlFor;
+            radioContainer.appendChild(radioBtn);
 
-            this.inputsDiv.appendChild(radioBtn);
-
-            const radioLabel = document.createElement("label");
-            radioLabel.innerText = offeredAnswer;
-            radioLabel.htmlFor = radioBtn.id;
-            this.inputsDiv.appendChild(radioLabel);
+            const checkmark: HTMLSpanElement = document.createElement("span");
+            checkmark.classList.add(radioBtn.type);
+            radioContainer.appendChild(checkmark);
         }
     }
 }
@@ -141,7 +145,7 @@ class FillIn extends QuestionElement
         const partialText = document.createElement("p");
         partialText.innerText = this.questionJSONData.partialText!;
         partialText.innerHTML = partialText.innerHTML.replace(
-            /\u200e/g, `<input name="${this.questionJSONData.id}?">`);
+            /\u200e/g, `<input name="${this.questionJSONData.id}?" type="text">`);
         
         this.inputsDiv.appendChild(partialText);
     }
@@ -217,15 +221,15 @@ function saveAnswers(): void
             continue;
     
         // Handle inputs with multiple values (e.g. checkboxes).
-        if(! Reflect.has(formDataJSON, key)){
+        if(!(key in formDataJSON)) {
             formDataJSON[key] = value;
             continue;
         }
         // If key already exists, convert it into an array.
         if(! Array.isArray(formDataJSON[key])){
             formDataJSON[key] = [formDataJSON[key]] as string[];
-            (formDataJSON[key] as string[]).push(value);
         }
+        (formDataJSON[key] as string[]).push(value);
     }
     
     localStorage.setItem("123123", JSON.stringify(formDataJSON));

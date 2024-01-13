@@ -4,6 +4,10 @@ $color-accent: #3CE27C;
 $font-normal: sans-serif;
 $font-code: monospace;
 
+::selection {
+    background: transparentize($color: $color-accent, $amount: .5)
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -16,6 +20,72 @@ body {
 
 main {
     height: 100%;
+}
+
+$input-txt: 'input[type="text"], input[type="email"], input[type="password"], \
+             textarea, select, input[type="date"], input[type="time"]';
+
+$input-btn: 'input[type="button"], input[type="submit"], button';
+
+#{$input-txt} {
+    color: $color-fg;
+    background: lighten($color-bg, 2%);
+    border: none;
+    outline: 1px solid lighten($color-bg, 8%);
+    transition: outline-color .2s ease;
+    &:focus {
+        outline-color: $color-accent;
+    }
+}
+
+#{$input-btn}{
+    background: $color-bg;
+    border: none;
+    background: $color-accent;
+    padding: 2px 8px;
+    transition: filter .3s, transform .1s;
+    &:hover {
+        filter: saturate(2);
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+}
+
+label.multi-container {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    gap: .5rem;
+    position: relative;
+    cursor: pointer;
+    &:hover span {
+        box-shadow: 0 0 5px 1px $color-accent;
+    }
+    input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        opacity: 0;
+        &:checked ~ span {
+            background: $color-accent;
+            box-shadow: 0 0 5px 1px $color-accent;
+            border-color: $color-accent;
+        }
+    }
+    span.checkbox, span.radio {
+        order: -1;
+        // position: absolute;
+        // top: 0;
+        // left: 0;
+        height: 12px;
+        width: 12px;
+        background-color: lighten($color-bg, 2%);
+        border: 1px solid lighten($color-bg, 8%);
+        transition: all .15s ease;
+    }
+    span.radio {
+        border-radius: 50%;
+    }
 }
 
 footer mark#version {
@@ -33,9 +103,12 @@ a {
     color: $color-accent;
 }
 
+p {
+    margin: 0;
+}
+
 form {
     display: inline-block;
-    border: 1px solid;
     padding: 10px;
 }
 
@@ -54,9 +127,8 @@ form#questions-box{
     display: flex;
     flex-direction: column;
     user-select: none;
-    gap: .5rem;
+    gap: 1rem;
     & > div {
-        border: 1px solid darken($color-accent, 30%);
         h4 {
             color: $color-accent;
             margin: 0 .2rem 0;
@@ -64,7 +136,6 @@ form#questions-box{
     }
     input#submit {
         order: 10000;
-        width: fit-content;
+        width: min-content;
     }
 }
-    
