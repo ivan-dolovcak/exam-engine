@@ -7,7 +7,7 @@ interface IQuestionData
     type: string,
     partialText?: string,
     answers?: string[],
-    size?: [number, number?]
+    size?: [number, number]
 }
 
 interface IDocumentMetadata
@@ -35,15 +35,6 @@ abstract class QuestionElement extends HTMLDivElement
         titleEl.innerText = title;
         this.questionJSONData.title = title;
     }
-    
-    set ordinal(ordinal: number)
-    {
-        const ordinalEl
-            = this.getElementsByClassName("ordinal")[0] as HTMLSpanElement;
-        ordinalEl.innerText = ordinal.toString();
-        this.style.order = ordinal.toString();
-        this.questionJSONData.ordinal = ordinal;
-    }
 
     constructor(questionJSONData: IQuestionData)
     {
@@ -61,7 +52,6 @@ abstract class QuestionElement extends HTMLDivElement
             = this.getElementsByClassName("inputs")[0] as HTMLDivElement;
 
         this.headerTitle = this.questionJSONData.title;
-        this.ordinal = this.questionJSONData.ordinal;
     }
 
     connectedCallback()
@@ -85,6 +75,7 @@ class ShortAnswer extends QuestionElement
 
         this.input = document.createElement("input");
         this.input.type = "text";
+        this.input.setAttribute("autocomplete", "off");
         this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
@@ -100,8 +91,8 @@ class LongAnswer extends QuestionElement
         super(questionJSONData);
 
         this.input = document.createElement("textarea");
-        this.input.rows = this.questionJSONData.size![0];
-        this.input.cols = this.questionJSONData.size![1]!;
+        this.input.rows = this.questionJSONData.size![1];
+        this.input.cols = this.questionJSONData.size![0];
         this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
@@ -205,6 +196,7 @@ async function generateDocument(): Promise<any>
 {
     documentMetadata = await fetchDocumentMetadata();
     questions = await fetchDocumentContent();
+    questions = questions.sort((q1, q2) => { return q1.ordinal - q2.ordinal });
 
     customElements.define("short-answer", ShortAnswer, { extends: "div" });
     customElements.define("single-choice", MultiChoice, { extends: "div" });
@@ -221,7 +213,12 @@ async function generateDocument(): Promise<any>
             continue;
 
         questionsBox?.appendChild(questionElement);
-    }    
+    }
+
+    const submitBtn: HTMLInputElement = document.createElement("input");
+    submitBtn.type = "submit";
+    submitBtn.value = "Predaj odgovore";
+    questionsBox?.appendChild(submitBtn);
 }
 
 type IAnswers = {

@@ -6,6 +6,19 @@
         "type": "trueFalse"
     },
     {
+        "id": 41,
+        "ordinal": 10,
+        "title": "Which colors can apples have?",
+        "type": "multiChoice",
+        "answers": [
+            "green",
+            "yellow",
+            "orange",
+            "red",
+            "blue"
+        ]
+    },
+    {
         "id": 2,
         "ordinal": 2,
         "title": "Which color are lemons?",
@@ -51,8 +64,7 @@
         "ordinal": 5,
         "title": "Explain what lemons are.",
         "type": "longAnswer",
-        "width": 80,
-        "height": 10
+        "size": [80, 10]
     },
     {
         "id": 11,
