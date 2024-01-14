@@ -10,7 +10,17 @@ interface IQuestionData
     size?: [number, number?]
 }
 
+interface IDocumentMetadata
+{
+    name: string,
+    type: string,
+    passwordHash: string,
+    deadlineDatetime: string,
+}
+
+let documentMetadata: IDocumentMetadata;
 let questions: IQuestionData[];
+const documentID = new URL(location.toString()).searchParams.get("ID");
 
 abstract class QuestionElement extends HTMLDivElement
 {
@@ -173,17 +183,28 @@ function generateQuestionElement(question: IQuestionData)
     return questionElement;
 }
 
-async function fetchDocumentJSON(): Promise<any>
+async function fetchDocumentMetadata(): Promise<any>
 {
     // For passing the document from PHP to JS (loadDocumentContent in GET):
-    const response = await fetch(`${window.location.href}&loadDocumentContent`);
+    const response = await fetch(
+        `/views/document.php?ID=${documentID}&loadDocumentMetadata`);
+    const json = await response.json();
+    return json;
+}
+
+async function fetchDocumentContent(): Promise<any>
+{
+    // For passing the document from PHP to JS (loadDocumentContent in GET):
+    const response = await fetch(
+        `/views/document.php?ID=${documentID}&loadDocumentContent`);
     const json = await response.json();
     return JSON.parse(json);
 }
 
 async function generateDocument(): Promise<any>
 {
-    questions = await fetchDocumentJSON();
+    documentMetadata = await fetchDocumentMetadata();
+    questions = await fetchDocumentContent();
 
     customElements.define("short-answer", ShortAnswer, { extends: "div" });
     customElements.define("single-choice", MultiChoice, { extends: "div" });
@@ -232,6 +253,6 @@ function saveAnswers(): void
         (formDataJSON[key] as string[]).push(value);
     }
     
-    localStorage.setItem("123123", JSON.stringify(formDataJSON));
+    localStorage.setItem(documentID + "answers", JSON.stringify(formDataJSON));
     console.log("Saved document answers locally.");
 }

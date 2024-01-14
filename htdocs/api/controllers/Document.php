@@ -20,14 +20,25 @@ class Document
         }
     }
 
-    public static function loadJSON(int $ID): string
+    public static function loadMetadataJSON(int $ID): string
+    {
+        $db = new DB();
+
+        $db->execStmt("loadDocumentMetadata", $ID);
+        $sqlResult = $db->stmt->get_result();
+        $json = $sqlResult->fetch_assoc();
+
+        return json_encode($json);
+    }
+
+    public static function loadContentJSON(int $ID): string
     {
         $db = new DB();
 
         $db->execStmt("loadDocumentContent", $ID);
         $sqlResult = $db->stmt->get_result();
-        $json = $sqlResult->fetch_array();
+        $json = $sqlResult->fetch_row()[0];
 
-        return json_encode($json[0]);
+        return json_encode($json);
     }
 }
