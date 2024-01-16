@@ -25,7 +25,7 @@ main {
 $input-txt: 'input[type="text"], input[type="email"], input[type="password"], \
              textarea, select, input[type="date"], input[type="time"]';
 
-$input-btn: 'input[type="button"], input[type="submit"], button';
+$input-btn: 'input[type="button"], input[type="submit"], input[type="reset"], button';
 
 #{$input-txt} {
     color: $color-fg;
@@ -49,6 +49,10 @@ $input-btn: 'input[type="button"], input[type="submit"], button';
         transform: scale(1.1);
         cursor: pointer;
     }
+    width: fit-content;
+}
+input[type="reset"] {
+    background: yellow;
 }
 
 label.multi-container {

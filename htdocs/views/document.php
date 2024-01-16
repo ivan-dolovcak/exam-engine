@@ -41,7 +41,7 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 
     <main id="main">
         <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
-            <script defer>generateDocument();</script>
+            <script>generateDocument();</script>
         </form>
     </main>
 

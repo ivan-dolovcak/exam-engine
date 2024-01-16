@@ -219,6 +219,15 @@ async function generateDocument(): Promise<any>
     submitBtn.type = "submit";
     submitBtn.value = "Predaj odgovore";
     questionsBox?.appendChild(submitBtn);
+
+    // For clearing out form (debug):
+    const resetBtn: HTMLInputElement = document.createElement("input");
+    resetBtn.type = "reset";
+    resetBtn.value = "Obriši odgovore";
+    questionsBox?.appendChild(resetBtn);
+    resetBtn.onclick = () => { document.forms[0].reset(); saveAnswers(); };
+
+    loadAnswers();
 }
 
 type IAnswers = {
@@ -228,28 +237,60 @@ type IAnswers = {
 function saveAnswers(): void
 {
     const formData: FormData = new FormData(document.forms[0]);
-    let formDataJSON: IAnswers = {};
+    // Convert IterableIterator<[string, FormDataEntryValue]> to 2D string array:
+    const x = [...formData.entries()].map(a => [a[0], a[1].toString()]);
+    const formDataSerialized: string = new URLSearchParams(x).toString();
+
+    // let formDataJSON: IAnswers = {};
+
+    // for (let [key, value] of formData.entries())
+    // {
+    //     value = value.toString().trim();
+    //     // Don't store unanswered questions, except for FillIn type to preserve
+    //     // order of answers (their name ends with a ?):
+    //     if (! value && ! key.endsWith("?"))
+    //         continue;
     
-    for (let [key, value] of formData.entries())
-    {
-        value = value.toString().trim();
-        // Don't store unanswered questions, except for FillIn type to preserve
-        // order of answers (their name ends with a ?):
-        if (! value && ! key.endsWith("?"))
-            continue;
+    //     // Handle inputs with multiple values (e.g. checkboxes).
+    //     if(!(key in formDataJSON)) {
+    //         formDataJSON[key] = value;
+    //         continue;
+    //     }
+    //     // If key already exists, convert it into an array.
+    //     if(! Array.isArray(formDataJSON[key])){
+    //         formDataJSON[key] = [formDataJSON[key]] as string[];
+    //     }
+    //     (formDataJSON[key] as string[]).push(value);
+    // }
     
-        // Handle inputs with multiple values (e.g. checkboxes).
-        if(!(key in formDataJSON)) {
-            formDataJSON[key] = value;
-            continue;
-        }
-        // If key already exists, convert it into an array.
-        if(! Array.isArray(formDataJSON[key])){
-            formDataJSON[key] = [formDataJSON[key]] as string[];
-        }
-        (formDataJSON[key] as string[]).push(value);
-    }
-    
-    localStorage.setItem(documentID + "answers", JSON.stringify(formDataJSON));
+    localStorage.setItem(documentID + "answers", formDataSerialized);
     console.log("Saved document answers locally.");
+}
+
+function loadAnswers(): void
+{
+    const answersSerialized: string | null = localStorage.getItem(documentID + "answers");
+    if (answersSerialized == null)
+        return;
+    
+    const form: HTMLFormElement = document.forms[0];
+    const answers: [string, string][]
+        = Array.from((new URLSearchParams(answersSerialized)).entries());
+
+    let nodeCounter = 0;
+    for (const [name, val] of answers) {
+        const input: Element | RadioNodeList | null = form.elements.namedItem(name);
+        if (input instanceof RadioNodeList) {
+            if (name.endsWith("?"))
+                (input[nodeCounter++] as HTMLInputElement).value = val;
+            else
+                nodeCounter = 0;
+            for (let x of input) {
+                if ((x as HTMLInputElement).value == val)
+                    (x as HTMLInputElement).checked = true;
+            }
+        }
+        else
+            (input as HTMLInputElement).value = val;
+    }
 }
