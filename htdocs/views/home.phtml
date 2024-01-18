@@ -9,6 +9,17 @@ if (! isset($_SESSION["userID"]))
 <html lang="hr">
 <head>
     <?php require_once "head.phtml"; setPageTitle("Početna"); ?>
+
+    <script>
+        function showOverlay(overlayID)
+        {
+            const overlay = document.getElementById(overlayID).style.display = "flex";
+        }
+        function hideOverlay(overlayID)
+        {
+            const overlay = document.getElementById(overlayID).style.display = "none";
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -20,29 +31,37 @@ if (! isset($_SESSION["userID"]))
         
         <?php require_once "list_documents.php" ?>
 
-        <h3>Napravi novi dokument</h3>
+        
+        <div class="overlay" id="create-document-overlay">
+            <form action="/api/create_document.php" method="post" class="form">
+            <h3>Napravi novi dokument</h3>
+            <label required for="name">Naziv</label>
+            <input autofocus required type="text" name="name" value="Novi dokument">
 
-        <form action="/api/create_document.php" method="post">
-            <label for="name">Naziv</label>
-            <input required type="text" name="name" value="Novi dokument">
-            <br>
-            <label for="type">Vrsta</label>
+            <label required for="type">Vrsta</label>
             <select required name="type">
                 <option value="exam">Ispit</option>
                 <option value="form">Obrazac</option>
             </select>
-            <br>
+
             <label for="deadline">Rok za predaju</label>
+            <div>
             <input type="date" name="deadlineDate">
             <input type="time" name="deadlineTime" value="00:00" min="00:00">
-            <br>
+            </div>
+
             <label for="password">Lozinka</label>
             <input type="text" name="password">
-            <br>
+
             <input type="submit" value="Dodaj">
+
+            <button type="button" class="close-overlay" onclick="hideOverlay('create-document-overlay');">&times;</button>
 
             <?php echo Util::getFormMsg(); ?>
         </form>
+        </div>
+
+        <button onclick="this.blur(); showOverlay('create-document-overlay');">Napravi novi dokument</button>
 
         <hr>
 

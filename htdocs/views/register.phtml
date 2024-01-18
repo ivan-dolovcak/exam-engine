@@ -15,33 +15,32 @@ if (isset($_SESSION["userID"]))
         <?php require_once "header.phtml"; ?>
     </header>
 
-    <main>
-        <h2>Registracija</h2>
-        
-        <form method="post" action="/api/register_process.php">
-            <label for="username">Korisničko ime</label>
+    <main class="form-center">
+        <form method="post" action="/api/register_process.php" class="form">
+            <h2>Registracija</h2>
+            <label required for="username">Korisničko ime</label>
             <input required type="text" name="username">
             <br>
-            <label for="email">E-mail</label>
+            <label required for="email">E-mail</label>
             <input required type="email" name="email">
             <br>
-            <label for="password">Lozinka</label>
+            <label required for="password">Lozinka</label>
             <input required type="password" name="password">
             <br>
-            <label for="passwordConfirm">Potvrdi lozinku</label>
+            <label required for="passwordConfirm">Potvrdi lozinku</label>
             <input required type="password" name="passwordConfirm">
             <br>
-            <label for="firstName">Ime</label>
+            <label required for="firstName">Ime</label>
             <input required type="text" name="firstName">
             <br>
-            <label for="lastName">Prezime</label>
+            <label required for="lastName">Prezime</label>
             <input required type="text" name="lastName">
             <br>
             <input type="submit" value="Registriraj me">
             <?php echo Util::getFormMsg(); ?>
+            <small>Imate račun? <a href="/views/login.phtml">Prijavite se</a></small>
         </form>
 
-        <p>Imate račun? <a href="/views/login.phtml">Prijavite se</a></p>
     </main>
 
     <footer>

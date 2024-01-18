@@ -15,23 +15,22 @@ if (isset($_SESSION["userID"]))
         <?php require_once "header.phtml"; ?>
     </header>
 
-    <main>
-        <h2>Prijava</h2>
-        
-        <form action="/api/login_process.php" method="post">
-            <label for="emailOrPassword">E-mail ili korisničko ime</label>
+    <main class="form-center">
+        <form action="/api/login_process.php" method="post" class="form">
+            <h2>Prijava</h2>
+            <label required for="emailOrPassword">E-mail ili korisničko ime</label>
             <input required type="text" name="emailOrPassword">
             <br>
-            <label for="password">Lozinka</label>
+            <label required for="password">Lozinka</label>
             <input required type="password" name="password">
             <br>
             <input type="submit" value="Prijavi me">
             <?php echo Util::getFormMsg(); ?>
+            <small>
+                Nemate račun? <a href="/views/register.phtml">Registrirajte se</a>
+            </small>
         </form>
 
-        <p>
-            Nemate račun? <a href="/views/register.phtml">Registrirajte se</a>
-        </p>
     </main>
 
     <footer>
