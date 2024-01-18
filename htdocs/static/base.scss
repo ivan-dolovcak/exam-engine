@@ -1,8 +1,4 @@
-$color-fg: #C8C8C8;
-$color-bg: #0A0A0A;
-$color-accent: #3CE27C;
-$font-normal: sans-serif;
-$font-code: monospace;
+@import "vars";
 
 ::selection {
     background: transparentize($color: $color-accent, $amount: .5)
@@ -11,32 +7,52 @@ $font-code: monospace;
 body {
     margin: 0;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: min-content 1fr min-content;
     background: $color-bg;
     color: $color-fg;
     font-family: $font-normal;
 }
 
-main {
-    height: 100%;
-}
-
-$input-txt: 'input[type="text"], input[type="email"], input[type="password"], \
-             textarea, select, input[type="date"], input[type="time"]';
-
-$input-btn: 'input[type="button"], input[type="submit"], input[type="reset"], button';
-
-#{$input-txt} {
-    color: $color-fg;
-    background: lighten($color-bg, 2%);
-    border: none;
-    outline: 1px solid lighten($color-bg, 8%);
-    transition: outline-color .2s ease;
-    &:focus {
-        outline-color: $color-accent;
+header {
+    display: flex;
+    align-items: center;
+    padding: 10px 10px 0 10px;
+    margin-bottom: 3rem;
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    border-image: linear-gradient(to right, $color-accent 30%, transparent) 1;
+    h1 {
+        width: fit-content;
+        white-space: nowrap;
+    }
+    nav {
+        width: 100%;
+        justify-content: flex-end;
+        display: flex;
+        gap: .5rem;
+        a {
+            text-decoration: none;
+            border: 1px solid $color-accent;
+            padding: 5px 8px;
+            transition: padding .2s;
+            font-weight: bold;
+            color: $color-accent;
+            &:hover {
+                padding: 5px 15px;
+            }
+        }
     }
 }
+
+a {
+    color: $color-accent;
+}
+
+// Custom buttons
+
+$input-btn: 'input[type="button"], input[type="submit"], input[type="reset"], \
+             button';
 
 #{$input-btn}{
     background: $color-bg;
@@ -55,49 +71,25 @@ input[type="reset"] {
     background: yellow;
 }
 
-label.multi-container {
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    gap: .5rem;
-    position: relative;
-    cursor: pointer;
-    &:hover span {
-        box-shadow: 0 0 5px 1px $color-accent;
-    }
-    input {
-        position: absolute;
-        top: 0;
-        right: 0;
-        opacity: 0;
-        transition: outline-color .15s ease;
-        & ~ span {
-            outline: 1px solid transparent;
-        }
-        &:focus ~ span {
-            outline-color: $color-accent;
-        }
-        &:checked ~ span {
-            background: $color-accent;
-            box-shadow: 0 0 5px 1px $color-accent;
-            border-color: $color-accent;
-        }
-    }
-    span.checkbox, span.radio {
-        order: -1;
-        // position: absolute;
-        // top: 0;
-        // left: 0;
-        height: 12px;
-        width: 12px;
-        background-color: lighten($color-bg, 2%);
-        border: 1px solid lighten($color-bg, 8%);
-        transition: all .15s ease;
-    }
-    span.radio {
-        border-radius: 50%;
+
+// Custom textboxes
+
+$input-txt: 'input[type="text"], input[type="email"], input[type="password"], \
+             textarea, select, input[type="date"], input[type="time"]';
+
+#{$input-txt} {
+    color: $color-fg;
+    background: lighten($color-bg, 2%);
+    border: none;
+    outline: 1px solid lighten($color-bg, 8%);
+    transition: outline-color .2s ease;
+    &:focus {
+        outline-color: $color-accent;
     }
 }
+
+
+// Version info (bottom right)
 
 footer mark#version {
     position: fixed;
@@ -106,62 +98,7 @@ footer mark#version {
     font-family: $font-code;
 }
 
-input, select {
-    margin: 2px;
-}
-
-a {
-    color: $color-accent;
-}
-
-p {
-    margin: 0;
-}
-
-form {
-    display: inline-block;
-    padding: 10px;
-}
-
 div.document-box {
     width: fit-content;
     border: 1px solid $color-accent;
-}
-
-main#main {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    counter-reset: question-ordinal;
-}
-
-form#questions-box{
-    display: flex;
-    flex-direction: column;
-    user-select: none;
-    gap: 1rem;
-    & > div {
-        h4.title {
-            color: $color-accent;
-            margin: 0 .2rem .5rem 0;
-            &::before {
-                counter-increment: question-ordinal;
-                content: counter(question-ordinal);
-                background-color: $color-bg;
-                width: 1.2rem;
-                height: 1.2rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid $color-accent;
-                margin-right: .4rem;
-            }
-        }
-        div.inputs {
-            margin-left: 1.8rem;
-        }
-    }
-    input[type="submit"] {
-        width: min-content;
-    }
 }

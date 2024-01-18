@@ -33,13 +33,15 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
     
     <?php require_once "{$_SERVER["DOCUMENT_ROOT"]}/partials/question_template.html"; ?>
     <script src="/api/generate_document.js"></script>
+
+    <link rel="stylesheet" href="/static/document.css">
 </head>
 <body>
     <header>
         <?php require_once "header.phtml"; ?>
     </header>
 
-    <main id="main">
+    <main id="main-wrapper">
         <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
             <script>generateDocument();</script>
         </form>

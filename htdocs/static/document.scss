@@ -1,0 +1,87 @@
+@import "vars";
+
+main#main-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    counter-reset: question-ordinal;
+}
+
+form#questions-box{
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-user-select: none; // Safari
+    gap: 1.5rem;
+    // Question box
+    & > div {
+        p {
+            margin: 0;
+        }
+        h4.title {
+            display: flex;
+            color: $color-accent;
+            margin: 0 .2rem .5rem 0;
+            &::before {
+                counter-increment: question-ordinal;
+                content: counter(question-ordinal) ".";
+                background-color: $color-bg;
+                width: 1.2rem;
+                height: 1.2rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid $color-accent;
+                margin-right: .4rem;
+            }
+        }
+        div.inputs {
+            margin-left: 1.8rem;
+        }
+    }
+}
+
+
+// Custom checkboxes and radiobuttons
+
+label.multi-container {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    gap: .5rem;
+    position: relative;
+    cursor: pointer;
+    &:hover span {
+        box-shadow: 0 0 5px 1px $color-accent;
+    }
+    input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        opacity: 0;
+        transition: outline-color .15s ease;
+        & ~ span {
+            outline: 1px solid transparent;
+        }
+        &:focus ~ span {
+            outline-color: $color-accent;
+        }
+        &:checked ~ span {
+            background: $color-accent;
+            box-shadow: 0 0 5px 1px $color-accent;
+            border-color: $color-accent;
+        }
+    }
+    span.checkbox, span.radio {
+        order: -1;
+        height: 12px;
+        width: 12px;
+        background-color: lighten($color-bg, 2%);
+        border: 1px solid lighten($color-bg, 8%);
+        transition: all .15s ease;
+    }
+    span.radio {
+        border-radius: 50%;
+    }
+}
