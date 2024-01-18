@@ -14,11 +14,14 @@ body {
     font-family: $font-normal;
 }
 
+main {
+    margin: 3rem 0;
+}
+
 header {
     display: flex;
     align-items: center;
     padding: 10px 10px 0 10px;
-    margin-bottom: 3rem;
     border-bottom-width: 2px;
     border-bottom-style: solid;
     border-image: linear-gradient(to right, $color-accent 30%, transparent) 1;
@@ -60,10 +63,11 @@ $input-btn: 'input[type="button"], input[type="submit"], input[type="reset"], \
     background: $color-accent;
     padding: 2px 8px;
     transition: filter .3s, transform .1s;
-    &:hover {
+    &:hover, &:focus {
         filter: saturate(2);
         transform: scale(1.1);
         cursor: pointer;
+        outline: none;
     }
     width: fit-content;
 }

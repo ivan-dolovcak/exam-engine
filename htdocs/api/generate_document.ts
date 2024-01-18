@@ -93,6 +93,7 @@ class LongAnswer extends QuestionElement
         this.input = document.createElement("textarea");
         this.input.rows = this.questionJSONData.size![1];
         this.input.cols = this.questionJSONData.size![0];
+        this.input.spellcheck = false;
         this.input.name = this.questionJSONData.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
@@ -146,7 +147,7 @@ class FillIn extends QuestionElement
         const partialText = document.createElement("p");
         partialText.innerText = this.questionJSONData.partialText!;
         partialText.innerHTML = partialText.innerHTML.replace(
-            /\u200e/g, `<input name="${this.questionJSONData.id}?" type="text">`);
+            /\u200e/g, `<input name="${this.questionJSONData.id}?" type="text" autocomplete="off">`);
         
         this.inputsDiv.appendChild(partialText);
     }
@@ -192,7 +193,8 @@ async function fetchDocumentContent(): Promise<any>
     return JSON.parse(json);
 }
 
-async function generateDocument(): Promise<any>
+
+async function generateDocument()
 {
     documentMetadata = await fetchDocumentMetadata();
     questions = await fetchDocumentContent();
@@ -214,18 +216,6 @@ async function generateDocument(): Promise<any>
 
         questionsBox?.appendChild(questionElement);
     }
-
-    const submitBtn: HTMLInputElement = document.createElement("input");
-    submitBtn.type = "submit";
-    submitBtn.value = "Predaj odgovore";
-    questionsBox?.appendChild(submitBtn);
-
-    // For clearing out form (debug):
-    const resetBtn: HTMLInputElement = document.createElement("input");
-    resetBtn.type = "reset";
-    resetBtn.value = "Obriši odgovore";
-    questionsBox?.appendChild(resetBtn);
-    resetBtn.onclick = () => { document.forms[0].reset(); saveAnswers(); };
 
     loadAnswers();
 }

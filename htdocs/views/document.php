@@ -32,9 +32,10 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
     <?php require_once "head.phtml"; setPageTitle("Pregled dokumenta"); ?>
     
     <?php require_once "{$_SERVER["DOCUMENT_ROOT"]}/partials/question_template.html"; ?>
-    <script src="/api/generate_document.js"></script>
 
     <link rel="stylesheet" href="/static/document.css">
+    
+    <script src="/api/generate_document.js"></script>
 </head>
 <body>
     <header>
@@ -43,8 +44,14 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 
     <main id="main-wrapper">
         <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
-            <script>generateDocument();</script>
+            <script defer>generateDocument();</script>
         </form>
+
+        <div id="questions-box-buttons">
+            <input type="button" value="Predaj odgovore">
+            <input type="reset" value="Obriši odgovore"
+                onclick="document.forms[0].reset(); saveAnswers();">
+        </div>
     </main>
 
     <footer>

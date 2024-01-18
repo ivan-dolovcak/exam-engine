@@ -7,6 +7,12 @@ main#main-wrapper {
     counter-reset: question-ordinal;
 }
 
+div#questions-box-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
 form#questions-box{
     align-self: center;
     display: flex;
