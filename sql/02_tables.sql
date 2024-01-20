@@ -37,7 +37,7 @@ create table `Submission` (
     `documentID`          mediumint unsigned not null,
     `userID`              mediumint unsigned not null,
     `datetimeStart`       datetime not null,
-    `datetimeEnd`         datetime not null,
+    `datetimeEnd`         datetime default utc_timestamp(),
     `submissionJSON`      json not null,
     primary key (`ID`),
     constraint `FK_SubmissionDocument`
