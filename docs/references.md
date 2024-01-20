@@ -30,10 +30,11 @@ project development, which will be referenced in the thesis paper.
 - IDE (config, git, individual files): vim: https://www.vim.org/
 - VCS: git: https://git-scm.com/
 - Terminal emulator: kitty: https://sw.kovidgoyal.net/kitty/
-- FTP uploading : lftp
+- Website publishing: htpublish: https://github.com/ivan-dolovcak/htpublish
 - phpMyAdmin: https://www.phpmyadmin.net/
 - regular expressions 101: https://regex101.com/
 - Web browsers: Mozilla Firefox, Ungoogled Chromium
+- JSON linter/validator/minifier: https://jsonlint.com/
 
 
 ## Standards followed
