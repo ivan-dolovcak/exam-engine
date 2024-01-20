@@ -1,6 +1,14 @@
 # Changelog
 
 
+# v0.4.0 (2024-01-20)
+
+- add more CSS for form elements, header & nav
+- more ajax requests in JS for document data
+- basic document redering algorithm done (refactoring needed)
+- document answers are saved and loaded locally
+
+
 # v0.3.1 (2024-01-05)
 
 - added ID obfuscation in GET URL's
