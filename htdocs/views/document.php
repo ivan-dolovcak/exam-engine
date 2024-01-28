@@ -35,7 +35,7 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 
     <link rel="stylesheet" href="/static/document.css">
     
-    <script src="/api/generate_document.js"></script>
+    <script type="module" src="/api/generate_document.js"></script>
 </head>
 <body>
     <header>
@@ -44,13 +44,11 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
 
     <main id="main-wrapper">
         <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
-            <script defer>generateDocument();</script>
         </form>
 
         <div id="questions-box-buttons">
             <input type="button" value="Predaj odgovore">
-            <input type="reset" value="Obriši odgovore"
-                onclick="document.forms[0].reset(); saveAnswers();">
+            <input id="clear-answers" type="reset" value="Obriši odgovore">
         </div>
     </main>
 
