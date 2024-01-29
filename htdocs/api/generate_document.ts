@@ -72,5 +72,26 @@ function clearAnswers(): void
     location.reload();
 }
 
+async function submitAnswers(): Promise<void>
+{
+    await fetch(`/api/submit_document.php?ID=${documentID}`, {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: localStorage.getItem(`${documentID}answers`)
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error('Network error.');
+        else {
+            clearAnswers();
+            location.href = "/views/home.phtml";
+        }
+    })
+
+}
+
 window.addEventListener("load", generateDocument);
-document.getElementById("clear-answers")?.addEventListener("click", clearAnswers);
+document.getElementById("clear-answers")?.addEventListener("click", () => { clearAnswers(); });
+document.getElementById("submit-answers")?.addEventListener("click", submitAnswers);

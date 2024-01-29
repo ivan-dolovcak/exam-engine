@@ -22,9 +22,6 @@ if (isset($_GET["loadDocumentContent"])) {
     echo $documentJSON;
     die;
 }
-
-$formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
-
 ?>
 <!DOCTYPE html>
 <html lang="hr">
@@ -43,11 +40,10 @@ $formAction = "/api/submit_document.php?ID={$_GET["ID"]}";
     </header>
 
     <main id="main-wrapper">
-        <form id="questions-box" method="post" action="<?php echo $formAction; ?>">
-        </form>
+        <form id="questions-box"></form>
 
         <div id="questions-box-buttons">
-            <input type="button" value="Predaj odgovore">
+            <input id="submit-answers" type="button" value="Predaj odgovore">
             <input id="clear-answers" type="reset" value="Obriši odgovore">
         </div>
     </main>
