@@ -1,15 +1,16 @@
 import { QuestionElement, IQuestionData, IAnswer } from "./question_element.js";
 
-interface IDocumentMetadata
+interface IDocument
 {
     name: string,
     type: string,
     passwordHash: string,
     deadlineDatetime: string,
+    documentJSON?: string
 }
 
-let documentMetadata: IDocumentMetadata;
-let questions: IQuestionData[];
+let documentMetadata: IDocument;
+let documentContent: IQuestionData[];
 const documentID = new URL(location.toString()).searchParams.get("ID");
 let answers: IAnswer[] = [];
 
@@ -20,29 +21,20 @@ export function saveAnswersLocal(): void
     console.log("Saved document answers locally.");
 }
 
-async function fetchDocumentMetadata(): Promise<any>
+async function fetchDocument(): Promise<any>
 {
-    // For passing the document from PHP to JS (loadDocumentContent in GET):
-    const response = await fetch(
-        `/views/document.php?ID=${documentID}&loadDocumentMetadata`);
+    const response
+        = await fetch(`/views/document.php?ID=${documentID}&loadDocument`);
     const json = await response.json();
     return json;
 }
 
-async function fetchDocumentContent(): Promise<any>
-{
-    // For passing the document from PHP to JS (loadDocumentContent in GET):
-    const response = await fetch(
-        `/views/document.php?ID=${documentID}&loadDocumentContent`);
-    const json = await response.json();
-    return JSON.parse(json);
-}
-
 async function generateDocument()
 {
-    documentMetadata = await fetchDocumentMetadata();
-    questions = await fetchDocumentContent();
-    questions = questions.sort((q1, q2) => { return q1.ordinal - q2.ordinal });
+    documentMetadata = await fetchDocument();
+    documentContent = JSON.parse(documentMetadata.documentJSON!);
+    delete documentMetadata.documentJSON;
+    documentContent = documentContent.sort((q1, q2) => { return q1.ordinal - q2.ordinal });
 
     const localAnswers = localStorage.getItem(documentID + "answers");
     if (localAnswers !== null)
@@ -51,7 +43,7 @@ async function generateDocument()
     const questionsBox
         = document.getElementById("questions-box") as HTMLFormElement | null;
     
-    for (const question of questions) {
+    for (const question of documentContent) {
         let answer: IAnswer | undefined = answers.find(x => x.id === question.id);
 
         let questionElement: QuestionElement | undefined;
@@ -88,10 +80,9 @@ async function submitAnswers(): Promise<void>
             clearAnswers();
             location.href = "/views/home.phtml";
         }
-    })
-
+    });
 }
 
 window.addEventListener("load", generateDocument);
-document.getElementById("clear-answers")?.addEventListener("click", () => { clearAnswers(); });
+document.getElementById("clear-answers")?.addEventListener("click", clearAnswers);
 document.getElementById("submit-answers")?.addEventListener("click", submitAnswers);

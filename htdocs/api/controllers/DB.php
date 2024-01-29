@@ -44,15 +44,9 @@ class DB
                         where `authorID` = ?",
             "types" => "i"
         ],
-        "loadDocumentMetadata" => [
+        "loadDocument" => [
             "query" => "select `name`, `type`, `passwordHash`, 
-                            `deadlineDatetime`
-                        from `Document`
-                        where `ID` = ?",
-            "types" => "i"
-        ],
-        "loadDocumentContent" => [
-            "query" => "select `documentJSON`
+                            `deadlineDatetime`, `documentJSON`
                         from `Document`
                         where `ID` = ?",
             "types" => "i"

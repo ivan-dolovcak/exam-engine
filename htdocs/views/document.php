@@ -10,18 +10,11 @@ if (! isset($_GET["ID"]))
 
 $documentID = Util::deobfuscateID($_GET["ID"]);
 // For passing the document metadata to JS:
-if (isset($_GET["loadDocumentMetadata"])) {
-    $documentJSON = Document::loadMetadataJSON($documentID);
+if (isset($_GET["loadDocument"])) {
+    $documentJSON = Document::load($documentID);
     echo $documentJSON;
     die;
 } 
-
-// For passing the document JSON to JS:
-if (isset($_GET["loadDocumentContent"])) {
-    $documentJSON = Document::loadContentJSON($documentID);
-    echo $documentJSON;
-    die;
-}
 ?>
 <!DOCTYPE html>
 <html lang="hr">
