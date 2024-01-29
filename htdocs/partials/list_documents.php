@@ -19,9 +19,9 @@ foreach ($documents as $document) {
         echo "<p>Rok predaje: {$document["deadlineDatetime"]}</p>";
 
     $obfDocumentID = urlencode(Util::obfuscateID($document["ID"]));
-    echo "<a href='/views/document.php?ID=$obfDocumentID'>
+    echo "<a href='/views/document.php?documentID=$obfDocumentID&mode=answer'>
         Otvori</a> ";
-    echo "<a href='/views/document.php?ID=$obfDocumentID?mode=edit'>
+    echo "<a href='/views/document.php?documentID=$obfDocumentID&mode=edit'>
         Uredi</a>";
 
     echo "</div>";

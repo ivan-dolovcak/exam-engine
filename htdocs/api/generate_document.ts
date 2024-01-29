@@ -7,36 +7,49 @@ interface IDocument
     passwordHash: string,
     deadlineDatetime: string,
     documentJSON?: string
+    ID: string,
+    generatingMode: string
 }
 
 let documentMetadata: IDocument;
 let documentContent: IQuestionData[];
-const documentID = new URL(location.toString()).searchParams.get("ID");
 let answers: IAnswer[] = [];
 
+const get: URLSearchParams = new URL(location.toString()).searchParams;
+const documentID = get.get("documentID");
+const generatingMode = get.get("mode");
+const answersLSName = `${documentID}answers`;
 
 export function saveAnswersLocal(): void
 {
-    localStorage.setItem(documentID + "answers", JSON.stringify(answers));
+    localStorage.setItem(answersLSName, JSON.stringify(answers));
     console.log("Saved document answers locally.");
 }
 
-async function fetchDocument(): Promise<any>
+async function fetchDocument(): Promise<IDocument>
 {
     const response
-        = await fetch(`/views/document.php?ID=${documentID}&loadDocument`);
+        = await fetch(`/views/document.php?documentID=${documentID}&loadDocument`);
     const json = await response.json();
     return json;
 }
 
-async function generateDocument()
+async function generateDocument(): Promise<void>
 {
     documentMetadata = await fetchDocument();
+    if (documentMetadata === null) {
+        location.href = "/views/home.phtml";
+        return;
+    }
+
+    documentMetadata.ID = get.get("documentID")!;
+    documentMetadata.generatingMode = get.get("mode")!;
+
     documentContent = JSON.parse(documentMetadata.documentJSON!);
     delete documentMetadata.documentJSON;
     documentContent = documentContent.sort((q1, q2) => { return q1.ordinal - q2.ordinal });
 
-    const localAnswers = localStorage.getItem(documentID + "answers");
+    const localAnswers = localStorage.getItem(answersLSName);
     if (localAnswers !== null)
         answers = JSON.parse(localAnswers);
 

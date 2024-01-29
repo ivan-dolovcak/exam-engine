@@ -15,7 +15,7 @@ foreach ($submissions as $submission) {
     echo "<p>Predano {$submission["datetimeEnd"]}.</p>";
 
     $obfSubmissionID = urlencode(Util::obfuscateID($submission["ID"]));
-    echo "<a href='/views/document.php?submissionID=$obfSubmissionID'>
+    echo "<a href='/views/document.php?submissionID=$obfSubmissionID&mode=review'>
         Otvori</a>";
 
     echo "</div>";
