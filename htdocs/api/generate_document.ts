@@ -1,7 +1,7 @@
-import { QuestionElement, IQuestionData, IAnswer } from "./question_element.js";
+import { QuestionElement, IQuestionData, IAnswerData } from "./question_element.js";
 
 /** Document data object from DB. */
-interface IDocument
+interface IDocumentData
 {
     name: string,
     type: string,
@@ -12,18 +12,15 @@ interface IDocument
     generatingMode: string
 }
 
-export let documentMetadata: IDocument;
+export let documentMetadata: IDocumentData;
 let documentContent: IQuestionData[];
-let answers: IAnswer[] = [];
+let answers: IAnswerData[] = [];
 let answersLSName: string; // localStorage variable name
 
-const GET: URLSearchParams = new URL(location.toString()).searchParams;
-
 /** Fetch required document data from DB. */
-async function fetchDocument(): Promise<IDocument>
+async function fetchDocument(): Promise<IDocumentData>
 {
-    const response = await fetch(
-        `/views/document.php?documentID=${GET.get("documentID")}&loadDocument`);
+    const response = await fetch(`${location.href}&loadDocument`);
     const json = await response.json();
     return json;
 }
@@ -40,25 +37,25 @@ function generateDocument(): void
     if (localAnswers !== null)
         answers = JSON.parse(localAnswers);
 
-    // Dynamic content generation
-    //
+    // Dynamic content generation.
     const questionsBox
         = document.getElementById("questions-box") as HTMLFormElement | null;
     
-    for (const question of documentContent) {
+    for (const questionData of documentContent) {
         // Find the user's corresponding answer to the current question:
-        let answer: IAnswer | undefined = answers.find(
-            answer => answer.id === question.id);
+        let answerData: IAnswerData | undefined = answers.find(
+            answer => answer.id === questionData.id);
 
         let questionElement: QuestionElement | undefined;
         // If user hasn't submitted an answer, create an empty one:
-        if (answer === undefined) {
-            answers.push({ id: question.id, value: null });
+        if (answerData === undefined) {
+            answers.push({ id: questionData.id, value: null });
             questionElement = QuestionElement.generate(
-                question, answers[answers.length - 1]);
+                questionData, answers[answers.length - 1]);
         }
         else
-            questionElement = QuestionElement.generate(question, answer);
+            questionElement = QuestionElement.generate(
+                questionData, answerData);
 
         questionsBox?.appendChild(questionElement!);
     }
@@ -107,6 +104,8 @@ async function init(): Promise<void>
         return;
     }
 
+    const GET: URLSearchParams = new URL(location.toString()).searchParams;
+
     documentMetadata.ID = GET.get("documentID")!;
     documentMetadata.generatingMode = GET.get("mode")!;
     answersLSName = `${documentMetadata.ID}answers`;
@@ -114,6 +113,9 @@ async function init(): Promise<void>
     // Move the document content from the metadata into its separate object:
     documentContent = JSON.parse(documentMetadata.documentJSON!);
     delete documentMetadata.documentJSON;
+
+    if (documentMetadata.generatingMode !== "answer")
+        document.getElementById("questions-box-buttons")?.remove();
 
     document.getElementById(
         "clear-answers")?.addEventListener("click", clearAnswers);

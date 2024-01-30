@@ -1,6 +1,6 @@
 import { documentMetadata, saveAnswersLocal } from "./generate_document.js";
 
-/** Question object extracted from the document JSON. */
+/** Every question element has this data object bound to it. */
 export interface IQuestionData
 {
     id: string,
@@ -12,7 +12,7 @@ export interface IQuestionData
     size?: [number, number]
 }
 
-export interface IAnswer
+export interface IAnswerData
 {
     id: string,
     value: string | string[] | null
@@ -20,25 +20,29 @@ export interface IAnswer
 
 export abstract class QuestionElement extends HTMLDivElement
 {
-    protected questionJSONData: IQuestionData;
+    protected data: IQuestionData;
     protected inputsDiv: HTMLDivElement;
-    protected answer: IAnswer;
+    protected answer: IAnswerData;
+
+
+    abstract saveAnswer(): void;
+    abstract loadAnswer(): void;
 
     set headerTitle(title: string)
     {
         const titleEl
             = this.getElementsByClassName("title")[0] as HTMLHeadingElement;
         titleEl.innerText = title;
-        this.questionJSONData.title = title;
+        this.data.title = title;
     }
 
-    constructor(questionJSONData: IQuestionData, answer: IAnswer)
+    constructor(data: IQuestionData, answer: IAnswerData)
     {
         super();
-        this.questionJSONData = questionJSONData;
+        this.data = data;
         this.answer = answer;
    
-        // Create question box from HTML template:
+        // Create question box from HTML template.
         const questionTemplate = document.getElementById(
             "question-template") as HTMLTemplateElement;
         const questionHTML: DocumentFragment = questionTemplate.content;
@@ -48,26 +52,29 @@ export abstract class QuestionElement extends HTMLDivElement
         this.inputsDiv
             = this.getElementsByClassName("inputs")[0] as HTMLDivElement;
 
-        this.headerTitle = this.questionJSONData.title;
+        this.headerTitle = this.data.title;
     }
 
     connectedCallback()
     {
-        const inputs: NodeListOf<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>
+        type InputLike
+            = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        const inputs: NodeListOf<InputLike>
             = this.inputsDiv.querySelectorAll("input, textarea, select");
         
+        // Add autosave to all inputs.
         for (const input of inputs)
-            input.addEventListener("blur",
-                () => { this.saveAnswer(); saveAnswersLocal(); });
+            input.addEventListener("blur", () => {
+                this.saveAnswer(); saveAnswersLocal();
+            });
 
+        // Fill questions with user answers.
         if (this.answer.value !== null)
             this.loadAnswer();
     }
 
-    abstract saveAnswer(): void;
-    abstract loadAnswer(): void;
-
-    static generate(question: IQuestionData, answer: IAnswer)
+    /** Uses a corresponding constructor for the question type. */
+    static generate(question: IQuestionData, answer: IAnswerData)
         : QuestionElement | undefined
     {
         let questionElement: QuestionElement | undefined;
@@ -95,14 +102,15 @@ export class ShortAnswer extends QuestionElement
     private input: HTMLInputElement;
 
 
-    constructor(questionJSONData: IQuestionData, answer: IAnswer)
+    constructor(data: IQuestionData, answer: IAnswerData)
     {
-        super(questionJSONData, answer);
+        super(data, answer);
 
         this.input = document.createElement("input");
         this.input.type = "text";
-        this.input.setAttribute("autocomplete", "off");
-        this.input.name = this.questionJSONData.id.toString();
+        this.input.autocomplete = "off";
+        this.input.spellcheck = false;
+        this.input.name = this.data.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
 
@@ -110,6 +118,7 @@ export class ShortAnswer extends QuestionElement
     {
         this.answer.value = this.input.value;
     }
+
     loadAnswer(): void
     {
         this.input.value = this.answer.value as string;
@@ -121,15 +130,15 @@ export class LongAnswer extends QuestionElement
     private input: HTMLTextAreaElement;
 
 
-    constructor(questionJSONData: IQuestionData, answer: IAnswer)
+    constructor(data: IQuestionData, answer: IAnswerData)
     {
-        super(questionJSONData, answer);
+        super(data, answer);
 
         this.input = document.createElement("textarea");
-        this.input.rows = this.questionJSONData.size![1];
-        this.input.cols = this.questionJSONData.size![0];
+        this.input.rows = this.data.size![1];
+        this.input.cols = this.data.size![0];
         this.input.spellcheck = false;
-        this.input.name = this.questionJSONData.id.toString();
+        this.input.name = this.data.id.toString();
         this.inputsDiv.appendChild(this.input);
     }
 
@@ -137,6 +146,7 @@ export class LongAnswer extends QuestionElement
     {
         this.answer.value = this.input.value;
     }
+
     loadAnswer(): void
     {
         this.input.value = this.answer.value as string;
@@ -145,33 +155,34 @@ export class LongAnswer extends QuestionElement
 
 export class MultiChoice extends QuestionElement
 {
-    constructor(questionJSONData: IQuestionData, answer: IAnswer)
+    constructor(data: IQuestionData, answer: IAnswerData)
     {
-        super(questionJSONData, answer);
+        super(data, answer);
 
         let offeredAnswers;
-        if (this.questionJSONData.type === "trueFalse")
+        if (this.data.type === "trueFalse")
             offeredAnswers = ["točno", "netočno"];
         else
-            offeredAnswers = this.questionJSONData.answers!;
+            offeredAnswers = this.data.answers!;
 
         for (const offeredAnswer of offeredAnswers) {
+            // Custom checkbox/radiobutton generation.
+
             const radioContainer = document.createElement("label");
             radioContainer.classList.add("multi-container");
             radioContainer.innerText = offeredAnswer;
-            const randomID: number = Math.floor(Math.random() * 1000);
-            radioContainer.htmlFor = this.questionJSONData.id.toString() + randomID;
+            radioContainer.htmlFor = this.data.id.toString() + Math.random();
             this.inputsDiv.appendChild(radioContainer);
 
             const radioBtn = document.createElement("input");
             // The only difference for multiChoice is to use checkboxes:
-            if (this.questionJSONData.type === "multiChoice")
+            if (this.data.type === "multiChoice")
                 radioBtn.type = "checkbox";
             else
                 radioBtn.type = "radio";
 
             radioBtn.value = offeredAnswer;
-            radioBtn.name = this.questionJSONData.id.toString();
+            radioBtn.name = this.data.id.toString();
             radioBtn.id = radioContainer.htmlFor;
             radioContainer.appendChild(radioBtn);
 
@@ -188,9 +199,10 @@ export class MultiChoice extends QuestionElement
             if (radioBtn.checked)
                 this.answer.value.push(radioBtn.value);
         
-        if (this.questionJSONData.type === "singleChoice")
+        if (this.data.type === "singleChoice")
             this.answer.value = this.answer.value[0] ?? null;
     }
+
     loadAnswer(): void
     {
         let answer = this.answer.value;
@@ -205,14 +217,28 @@ export class MultiChoice extends QuestionElement
 
 export class FillIn extends QuestionElement
 {
-    constructor(questionJSONData: IQuestionData, answer: IAnswer)
+    constructor(data: IQuestionData, answer: IAnswerData)
     {
-        super(questionJSONData, answer);
+        super(data, answer);
 
-        const partialText = document.createElement("p");
-        partialText.innerText = this.questionJSONData.partialText!;
-        partialText.innerHTML = partialText.innerHTML.replace(
-            /\u200e/g, `<input name="${this.questionJSONData.id}?" type="text" autocomplete="off">`);
+        const partialText = document.createElement("div");
+        const textFragments: string[]
+            = this.data.partialText!.split("\u200e");
+        
+        for (const textFragment of textFragments) {
+            const textFragmentEl = document.createElement("span");
+            textFragmentEl.innerText = textFragment;
+            partialText.appendChild(textFragmentEl);
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = this.data.id;
+            input.spellcheck = false;
+            input.autocomplete = "off";
+            partialText.appendChild(input);
+        }
+
+        partialText.lastChild?.remove();
         
         this.inputsDiv.appendChild(partialText);
     }
@@ -226,6 +252,7 @@ export class FillIn extends QuestionElement
         if (this.answer.value.length === 0)
             this.answer.value = null;
     }
+
     loadAnswer(): void
     {
         const inputs = this.inputsDiv.getElementsByTagName("input");
