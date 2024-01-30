@@ -1,4 +1,4 @@
-import { saveAnswersLocal } from "./generate_document.js";
+import { documentMetadata, saveAnswersLocal } from "./generate_document.js";
 
 /** Question object extracted from the document JSON. */
 export interface IQuestionData
