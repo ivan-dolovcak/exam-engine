@@ -15,7 +15,7 @@ export interface IQuestionData
 export interface IAnswerData
 {
     id: string,
-    value: string | string[] | null
+    value: string | (string | null)[] | null
 }
 
 export abstract class QuestionElement extends HTMLDivElement
@@ -125,7 +125,10 @@ export class ShortAnswer extends QuestionElement
 
     saveAnswer(): void
     {
-        this.answer.value = this.input.value;
+        if (! this.input.value)
+            this.answer.value = null;
+        else
+            this.answer.value = this.input.value;
     }
 
     loadAnswer(): void
@@ -153,7 +156,10 @@ export class LongAnswer extends QuestionElement
 
     saveAnswer(): void
     {
-        this.answer.value = this.input.value;
+        if (! this.input.value)
+            this.answer.value = null;
+        else
+            this.answer.value = this.input.value;
     }
 
     loadAnswer(): void
@@ -256,7 +262,10 @@ export class FillIn extends QuestionElement
     {
         this.answer.value = [];
         for (const input of this.inputsDiv.getElementsByTagName("input"))
-            this.answer.value.push(input.value);
+            if (! input.value)
+                this.answer.value.push(null);
+            else
+                this.answer.value.push(input.value);
 
         if (this.answer.value.length === 0)
             this.answer.value = null;

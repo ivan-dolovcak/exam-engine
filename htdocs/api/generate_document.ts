@@ -88,7 +88,15 @@ function generateDocument(): void
 /** Save user submission locally at all times. */
 export function saveAnswersLocal(): void
 {
-    localStorage.setItem(answersLSName, JSON.stringify(answers));
+    // Save only non-nullish values:
+    const cleanAnswers: IAnswerData[]
+        = answers.filter(answer => {
+            if (Array.isArray(answer))
+                return ! answer.every(value => value === null);
+            return answer.value !== null
+        });
+
+    localStorage.setItem(answersLSName, JSON.stringify(cleanAnswers));
     console.log("Saved document answers locally.");
 }
 
@@ -96,7 +104,6 @@ function clearAnswers(): void
 {
     localStorage.removeItem(answersLSName);
     location.reload();
-    console.log("cleared local answers");
 }
 
 /** Store user submission in DB. */

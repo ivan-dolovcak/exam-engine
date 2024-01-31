@@ -1,9 +1,9 @@
-{
-    "1": true,
-    "2": "yellow",
-    "3": "orange",
-    "78": "green",
-    "4": ["red"],
-    "5": "lemons are a fruit",
-    "11": ["yellow", "fruit"]
-}
+[
+    { "ID": "1",  "value": "točno" },
+    { "ID": "2",  "value": "yellow" },
+    { "ID": "3",  "value": "orange" },
+    { "ID": "78", "value": "green" },
+    { "ID": "4",  "value": ["red"] },
+    { "ID": "5",  "value": "lemons are a fruit" },
+    { "ID": "11", "value": ["yellow", "fruit"] }
+]
