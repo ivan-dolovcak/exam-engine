@@ -58,7 +58,7 @@ label.multi-container {
     gap: .5rem;
     position: relative;
     cursor: pointer;
-    &:hover span {
+    &:hover input:enabled ~ span {
         box-shadow: 0 0 5px 1px $color-accent;
     }
     input {

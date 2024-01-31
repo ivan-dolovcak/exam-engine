@@ -19,4 +19,17 @@ class Submission
             return false;
         }
     }
+
+    public static function load(int $ID): string
+    {
+        $db = new DB();
+
+        $db->execStmt("loadSubmission", $ID);
+        $sqlResult = $db->stmt->get_result();
+        $json = $sqlResult->fetch_assoc();
+        // Every ID passed to front-end is obfuscated:
+        $json["documentID"] = Util::obfuscateID($json["documentID"]);
+
+        return json_encode($json);
+    }
 }

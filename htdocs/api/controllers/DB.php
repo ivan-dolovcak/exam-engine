@@ -64,6 +64,16 @@ class DB
                         where `userID` = ?",
             "types" => "i"
         ],
+        "getSubmissionDocumentID" => [
+            "query" => "select `documentID` from `Submission`
+                        where `ID` = ?",
+            "types" => "i"
+        ],
+        "loadSubmission" => [
+            "query" => "select * from `Submission`
+                        where `ID` = ?",
+            "types" => "i"
+        ],
     ];
 
     public readonly mysqli $conn;

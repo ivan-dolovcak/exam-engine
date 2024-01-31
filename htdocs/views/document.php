@@ -1,12 +1,17 @@
 <?php
 session_start();
 
-$documentID = Util::deobfuscateID($_GET["documentID"]);
 // For passing the document metadata to JS:
 if (isset($_GET["loadDocument"])) {
+    $documentID = Util::deobfuscateID($_GET["documentID"]);
     $documentJSON = Document::load($documentID);
-
     echo $documentJSON;
+    die;
+}
+if (isset($_GET["loadSubmission"])) {
+    $submissionID = Util::deobfuscateID($_GET["submissionID"]);
+    $submissionJSON = Submission::load($submissionID);
+    echo $submissionJSON;
     die;
 }
 
@@ -14,8 +19,8 @@ if (isset($_GET["loadDocument"])) {
 if (! isset($_SESSION["userID"]))
     Util::redirect("/views/login.phtml");
 
-if (! isset($_GET["documentID"]) || ! isset($_GET["mode"]))
-    Util::redirect("/views/home.phtml");
+// if (! isset($_GET["documentID"]) || ! isset($_GET["mode"]))
+//     Util::redirect("/views/home.phtml");
 
 if (! in_array($_GET["mode"], ["answer", "edit", "review"], strict:true))
     Util::redirect("/views/home.phtml");

@@ -63,10 +63,19 @@ export abstract class QuestionElement extends HTMLDivElement
             = this.inputsDiv.querySelectorAll("input, textarea, select");
         
         // Add autosave to all inputs.
-        for (const input of inputs)
-            input.addEventListener("blur", () => {
-                this.saveAnswer(); saveAnswersLocal();
-            });
+        if (documentMetadata.generatingMode !== "review")
+            for (const input of inputs)
+                input.addEventListener("blur", () => {
+                    this.saveAnswer(); saveAnswersLocal();
+                });
+        
+        // Deny user input when reviewing.
+        if (documentMetadata.generatingMode === "review")
+            for (const input of inputs) {
+                input.disabled = true;
+                // Disable hover:
+                input.parentElement?.style.setProperty("cursor", "default");
+            }
 
         // Fill questions with user answers.
         if (this.answer.value !== null)
