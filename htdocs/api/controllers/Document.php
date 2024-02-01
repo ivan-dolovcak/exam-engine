@@ -30,4 +30,13 @@ class Document
 
         return json_encode($json);
     }
+
+    public static function loadSolutions(int $ID): object
+    {
+        $db = new DB();
+        $db->execStmt("loadDocumentSolutions", $ID);
+        
+        $sqlResult = $db->stmt->get_result();
+        return $sqlResult->fetch_object();
+    }
 }

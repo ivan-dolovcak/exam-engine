@@ -109,7 +109,8 @@ function clearAnswers(): void
 /** Store user submission in DB. */
 async function submitAnswers(): Promise<void>
 {
-    await fetch(`/api/submit_document.php?ID=${documentMetadata.ID}`,
+    await fetch(
+        `/api/submit_document.php?documentID=${documentMetadata.ID}&documentType=${documentMetadata.type}`,
     {
         method: "post",
         headers: {
