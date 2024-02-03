@@ -53,7 +53,7 @@ class DB
         ],
         "createSubmission" => [
             "query" => "insert into `Submission`
-                        values (default, ?, ?, ?, default, ?)",
+                        values (default, ?, ?, ?, default, ?, default)",
             "types" => "iiss"
         ],
         "loadSubmissionsMetadata" => [
@@ -73,6 +73,12 @@ class DB
             "query" => "select `solutionJSON` from `Document`
                         where `ID` = ?",
             "types" => "i"
+        ],
+        "addSubmissionGrading" => [
+            "query" => "update `Submission`
+                        set `gradingJSON` = ?
+                        where `ID` = ?",
+            "types" => "si"
         ],
     ];
 

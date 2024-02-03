@@ -10,6 +10,7 @@ export interface IQuestionData
     partialText?: string,
     answers?: string[],
     size?: [number, number]
+    needsManualGrading?: boolean
 }
 
 export interface IAnswerData
@@ -214,8 +215,10 @@ export class MultiChoice extends QuestionElement
             if (radioBtn.checked)
                 this.answer.value.push(radioBtn.value);
         
-        if (this.data.type === "singleChoice")
+        if (this.data.type !== "multiChoice")
             this.answer.value = this.answer.value[0] ?? null;
+        if (Array.isArray(this.answer.value) && this.answer.value.length === 0)
+            this.answer.value = null;
     }
 
     loadAnswer(): void
