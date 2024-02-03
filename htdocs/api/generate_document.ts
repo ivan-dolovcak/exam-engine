@@ -8,7 +8,7 @@ interface IDocumentData
     passwordHash: string,
     deadlineDatetime: string,
     documentJSON?: string       // deleted after moving into documentContent
-    ID: string,
+    ID: number,
     submissionID: string,
     generatingMode?: string
 }
@@ -59,12 +59,12 @@ function generateDocument(): void
     for (const questionData of documentContent) {
         // Find the user's corresponding answer to the current question:
         let answerData: IAnswerData | undefined = answers.find(
-            answer => answer.id === questionData.id);
+            answer => answer.ID === questionData.ID);
 
         let questionElement: QuestionElement | undefined;
         // If user hasn't submitted an answer, create an empty one:
         if (answerData === undefined) {
-            answers.push({ id: questionData.id, value: null });
+            answers.push({ ID: questionData.ID, value: null });
             questionElement = QuestionElement.generate(
                 questionData, answers[answers.length - 1]);
         }

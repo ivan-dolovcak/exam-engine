@@ -3,19 +3,18 @@ import { documentMetadata, saveAnswersLocal } from "./generate_document.js";
 /** Every question element has this data object bound to it. */
 export interface IQuestionData
 {
-    id: string,
+    ID: number,
     ordinal: number,
     title: string,
     type: string,
     partialText?: string,
-    answers?: string[],
-    size?: [number, number]
+    offeredAnswers?: string[],
     needsManualGrading?: boolean
 }
 
 export interface IAnswerData
 {
-    id: string,
+    ID: number,
     value: string | (string | null)[] | null
 }
 
@@ -120,7 +119,7 @@ export class ShortAnswer extends QuestionElement
         this.input.type = "text";
         this.input.autocomplete = "off";
         this.input.spellcheck = false;
-        this.input.name = this.data.id.toString();
+        this.input.name = this.data.ID.toString();
         this.inputsDiv.appendChild(this.input);
     }
 
@@ -148,10 +147,8 @@ export class LongAnswer extends QuestionElement
         super(data, answer);
 
         this.input = document.createElement("textarea");
-        this.input.rows = this.data.size![1];
-        this.input.cols = this.data.size![0];
         this.input.spellcheck = false;
-        this.input.name = this.data.id.toString();
+        this.input.name = this.data.ID.toString();
         this.inputsDiv.appendChild(this.input);
     }
 
@@ -179,7 +176,7 @@ export class MultiChoice extends QuestionElement
         if (this.data.type === "trueFalse")
             offeredAnswers = ["točno", "netočno"];
         else
-            offeredAnswers = this.data.answers!;
+            offeredAnswers = this.data.offeredAnswers!;
 
         for (const offeredAnswer of offeredAnswers) {
             // Custom checkbox/radiobutton generation.
@@ -187,7 +184,7 @@ export class MultiChoice extends QuestionElement
             const radioContainer = document.createElement("label");
             radioContainer.classList.add("multi-container");
             radioContainer.innerText = offeredAnswer;
-            radioContainer.htmlFor = this.data.id.toString() + Math.random();
+            radioContainer.htmlFor = this.data.ID.toString() + Math.random();
             this.inputsDiv.appendChild(radioContainer);
 
             const radioBtn = document.createElement("input");
@@ -198,7 +195,7 @@ export class MultiChoice extends QuestionElement
                 radioBtn.type = "radio";
 
             radioBtn.value = offeredAnswer;
-            radioBtn.name = this.data.id.toString();
+            radioBtn.name = this.data.ID.toString();
             radioBtn.id = radioContainer.htmlFor;
             radioContainer.appendChild(radioBtn);
 
@@ -250,7 +247,7 @@ export class FillIn extends QuestionElement
 
             const input = document.createElement("input");
             input.type = "text";
-            input.name = this.data.id;
+            input.name = this.data.ID.toString();
             input.spellcheck = false;
             input.autocomplete = "off";
             partialText.appendChild(input);

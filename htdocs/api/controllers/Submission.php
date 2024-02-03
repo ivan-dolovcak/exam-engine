@@ -33,10 +33,10 @@ class Submission
         return json_encode($json);
     }
 
-    private static function findById(int $ID, array &$array): object | false
+    private static function findByID(int $ID, array &$array): object | false
     {
         foreach ($array as $answer)
-            if ($answer->id === $ID)
+            if ($answer->ID === $ID)
                 return $answer;
 
         return false;
@@ -58,14 +58,14 @@ class Submission
         $grades = [];
 
         foreach ($solutions as $solution) {
-            $question = self::findById($solution->id, $questions);
+            $question = self::findByID($solution->ID, $questions);
             // Don't auto-grade questions which need manual grading:
 
             if (isset($question->needsManualGrading) 
                 && $question->needsManualGrading)
                 continue;
 
-            $answer = self::findById($solution->id, $answers);
+            $answer = self::findByID($solution->ID, $answers);
 
             if (! $answer)
                 $grade = null; // Unanswered questions.
@@ -83,7 +83,7 @@ class Submission
             else
                 $grade = intval($solution->value === $answer->value);
 
-            array_push($grades, ["id" => $solution->id, "points" => $grade]);
+            array_push($grades, ["ID" => $solution->ID, "points" => $grade]);
         }
 
         $db = new DB();
