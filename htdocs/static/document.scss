@@ -22,10 +22,14 @@ form#questions-box{
     gap: 1.5rem;
     // Question box
     & > div {
+        div.header {
+            display: flex;
+        }
         p {
             margin: 0;
         }
         h4.title {
+            width: 100%;
             display: flex;
             color: $color-accent;
             margin: 0 .2rem .5rem 0;
@@ -45,6 +49,21 @@ form#questions-box{
         div.inputs {
             margin-left: 1.8rem;
         }
+    }
+    div.grade {
+        white-space: nowrap;
+    }
+    & > div.correct div.grade {
+        color: lime;
+    }
+    & > div.incorrect div.grade, & > div.unanswered div.grade {
+        color: red;
+    }
+    & > div.partially div.grade {
+        color: gold;
+    }
+    & > div.manual div.grade {
+        color: indigo;
     }
 }
 

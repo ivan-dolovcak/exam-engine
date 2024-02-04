@@ -10,7 +10,7 @@ interface IDocumentData
     documentJSON?: string       // deleted after moving into documentContent
     ID: number,
     submissionID: string,
-    generatingMode?: string
+    generatingMode?: string,
 }
 
 export interface ISubmissionData
@@ -18,13 +18,21 @@ export interface ISubmissionData
     documentID: string,
     datetimeStart: string,
     datetimeEnd: string,
-    submissionJSON: string
+    submissionJSON: string,
+    gradingJSON: string,
+}
+
+export interface IGradingData
+{
+    ID: number,
+    points: number | null,
 }
 
 export let documentMetadata: IDocumentData;
 let documentContent: IQuestionData[];
 /** User submitted form data for the specific document questions. */
 let answers: IAnswerData[] = [];
+let grades: IGradingData[];
 /** localStorage variable name for locally saved user form submission. */
 let answersLSName: string;
 let submission: ISubmissionData | null = null;
@@ -60,17 +68,21 @@ function generateDocument(): void
         // Find the user's corresponding answer to the current question:
         let answerData: IAnswerData | undefined = answers.find(
             answer => answer.ID === questionData.ID);
-
+        
+        let gradeData: IGradingData | undefined;
+        if (submission !== null)
+            gradeData = grades.find(grade => grade.ID === questionData.ID);
+        
         let questionElement: QuestionElement | undefined;
         // If user hasn't submitted an answer, create an empty one:
         if (answerData === undefined) {
             answers.push({ ID: questionData.ID, value: null });
             questionElement = QuestionElement.generate(
-                questionData, answers[answers.length - 1]);
+                questionData, answers[answers.length - 1], gradeData);
         }
         else
             questionElement = QuestionElement.generate(
-                questionData, answerData);
+                questionData, answerData, gradeData);
 
         questionsBox?.appendChild(questionElement!);
     }
@@ -146,6 +158,7 @@ async function init(): Promise<void>
         documentMetadataGET.ID = submission.documentID;
         
         answers = JSON.parse(submission.submissionJSON);
+        grades = JSON.parse(submission.gradingJSON);
     }
     else {
         answersLSName = `${documentMetadataGET.ID}answers`;

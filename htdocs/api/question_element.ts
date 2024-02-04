@@ -1,4 +1,4 @@
-import { documentMetadata, saveAnswersLocal } from "./generate_document.js";
+import { documentMetadata, IGradingData, saveAnswersLocal } from "./generate_document.js";
 
 /** Every question element has this data object bound to it. */
 export interface IQuestionData
@@ -9,13 +9,15 @@ export interface IQuestionData
     type: string,
     partialText?: string,
     offeredAnswers?: string[],
-    needsManualGrading?: boolean
+    needsManualGrading?: boolean,
+    required?: boolean,
+    points: number,
 }
 
 export interface IAnswerData
 {
     ID: number,
-    value: string | (string | null)[] | null
+    value: string | (string | null)[] | null,
 }
 
 export abstract class QuestionElement extends HTMLDivElement
@@ -23,6 +25,7 @@ export abstract class QuestionElement extends HTMLDivElement
     protected data: IQuestionData;
     protected inputsDiv: HTMLDivElement;
     protected answer: IAnswerData;
+    protected grade: IGradingData | undefined;
 
 
     abstract saveAnswer(): void;
@@ -36,11 +39,12 @@ export abstract class QuestionElement extends HTMLDivElement
         this.data.title = title;
     }
 
-    constructor(data: IQuestionData, answer: IAnswerData)
+    constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
         super();
         this.data = data;
         this.answer = answer;
+        this.grade = grade;
    
         // Create question box from HTML template.
         const questionTemplate = document.getElementById(
@@ -53,6 +57,31 @@ export abstract class QuestionElement extends HTMLDivElement
             = this.getElementsByClassName("inputs")[0] as HTMLDivElement;
 
         this.headerTitle = this.data.title;
+
+        if (documentMetadata.generatingMode === "review") {
+            // Add points (grades)
+            switch (this.grade?.points) {
+            case this.data.points:
+                this.classList.add("correct");
+                break;
+            case undefined:
+                this.classList.add("manual");
+                break;
+            case null:
+                this.classList.add("unanswered");
+                this.grade.points = 0;
+                break;
+            default:
+                if (this.grade!.points <= 0)
+                    this.classList.add("incorrect");
+                else
+                    this.classList.add("partially");
+            }
+
+            const gradeDiv
+                = this.getElementsByClassName("grade")[0] as HTMLDivElement;
+            gradeDiv.innerText = (grade?.points ?? "?") + "/" + data.points;
+        }
     }
 
     connectedCallback()
@@ -82,24 +111,24 @@ export abstract class QuestionElement extends HTMLDivElement
             this.loadAnswer();
     }
 
-    /** Uses a corresponding constructor for the question type. */
-    static generate(question: IQuestionData, answer: IAnswerData)
+    /** Uses a corresponding ctor for the question type. */
+    static generate(question: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
         : QuestionElement | undefined
     {
         let questionElement: QuestionElement | undefined;
 
         switch (question.type) {
         case "shortAnswer":
-            questionElement = new ShortAnswer(question, answer);
+            questionElement = new ShortAnswer(question, answer, grade);
             break;
         case "singleChoice": case "multiChoice": case "trueFalse":
-            questionElement = new MultiChoice(question, answer);
+            questionElement = new MultiChoice(question, answer, grade);
             break;
         case "longAnswer":
-            questionElement = new LongAnswer(question, answer);
+            questionElement = new LongAnswer(question, answer, grade);
             break;
         case "fillIn":
-            questionElement = new FillIn(question, answer);
+            questionElement = new FillIn(question, answer, grade);
         }
         
         return questionElement;
@@ -111,9 +140,9 @@ export class ShortAnswer extends QuestionElement
     private input: HTMLInputElement;
 
 
-    constructor(data: IQuestionData, answer: IAnswerData)
+    constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
-        super(data, answer);
+        super(data, answer, grade);
 
         this.input = document.createElement("input");
         this.input.type = "text";
@@ -142,9 +171,9 @@ export class LongAnswer extends QuestionElement
     private input: HTMLTextAreaElement;
 
 
-    constructor(data: IQuestionData, answer: IAnswerData)
+    constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
-        super(data, answer);
+        super(data, answer, grade);
 
         this.input = document.createElement("textarea");
         this.input.spellcheck = false;
@@ -168,9 +197,9 @@ export class LongAnswer extends QuestionElement
 
 export class MultiChoice extends QuestionElement
 {
-    constructor(data: IQuestionData, answer: IAnswerData)
+    constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
-        super(data, answer);
+        super(data, answer, grade);
 
         let offeredAnswers;
         if (this.data.type === "trueFalse")
@@ -232,9 +261,9 @@ export class MultiChoice extends QuestionElement
 
 export class FillIn extends QuestionElement
 {
-    constructor(data: IQuestionData, answer: IAnswerData)
+    constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
-        super(data, answer);
+        super(data, answer, grade);
 
         const partialText = document.createElement("div");
         const textFragments: string[]
