@@ -1,4 +1,4 @@
-import { documentMetadata, IGradingData, saveAnswersLocal } from "./generate_document.js";
+import { documentMetadata, IGradingData, saveAnswersLocal, solutions } from "./generate_document.js";
 
 /** Every question element has this data object bound to it. */
 export interface IQuestionData
@@ -26,10 +26,12 @@ export abstract class QuestionElement extends HTMLDivElement
     protected inputsDiv: HTMLDivElement;
     protected answer: IAnswerData;
     protected grade: IGradingData | undefined;
+    protected solution: IAnswerData;
 
 
     abstract saveAnswer(): void;
     abstract loadAnswer(): void;
+    abstract showSolution(): void;
 
     set headerTitle(title: string)
     {
@@ -45,6 +47,8 @@ export abstract class QuestionElement extends HTMLDivElement
         this.data = data;
         this.answer = answer;
         this.grade = grade;
+
+        this.solution= solutions!.find(solution => solution.ID === this.data.ID)!;
    
         // Create question box from HTML template.
         const questionTemplate = document.getElementById(
@@ -98,17 +102,21 @@ export abstract class QuestionElement extends HTMLDivElement
                     this.saveAnswer(); saveAnswersLocal();
                 });
         
-        // Deny user input when reviewing.
-        if (documentMetadata.generatingMode === "review")
+        // Fill questions with user answers.
+        if (this.answer.value !== null)
+            this.loadAnswer();
+        
+        if (documentMetadata.generatingMode === "review") {
+            if (solutions !== null)
+                this.showSolution();
+
+            // Deny user input when reviewing.
             for (const input of inputs) {
                 input.disabled = true;
                 // Disable hover:
                 input.parentElement?.style.setProperty("cursor", "default");
             }
-
-        // Fill questions with user answers.
-        if (this.answer.value !== null)
-            this.loadAnswer();
+        }
     }
 
     /** Uses a corresponding ctor for the question type. */
@@ -164,6 +172,18 @@ export class ShortAnswer extends QuestionElement
     {
         this.input.value = this.answer.value as string;
     }
+
+    showSolution(): void
+    {
+        if (this.grade?.points === 0) {
+            this.input.style.color = "red";
+            const solutionDiv = document.createElement("div");
+            this.inputsDiv.appendChild(solutionDiv);
+            solutionDiv.innerHTML = "Točan odgovor: <span style='color: lime;'>" + this.solution.value;
+        }
+        else
+            this.input.style.color = "lime";
+    }
 }
 
 export class LongAnswer extends QuestionElement
@@ -192,6 +212,11 @@ export class LongAnswer extends QuestionElement
     loadAnswer(): void
     {
         this.input.value = this.answer.value as string;
+    }
+
+    showSolution(): void
+    {
+        
     }
 }
 
@@ -255,9 +280,18 @@ export class MultiChoice extends QuestionElement
         for (const radioBtn of this.inputsDiv.getElementsByTagName("input"))
             if (answer.includes(radioBtn.value))
                 radioBtn.checked = true;
-            
     }
-}
+
+    showSolution(): void
+    {   
+        for (const checkbox of this.inputsDiv.getElementsByTagName("input")) {
+            if (this.solution.value?.includes(checkbox.value))
+                checkbox.parentElement?.classList.add("correct");
+            else if (checkbox.checked)
+                checkbox.parentElement?.classList.add("incorrect");
+        }
+    }
+} 
 
 export class FillIn extends QuestionElement
 {
@@ -305,6 +339,27 @@ export class FillIn extends QuestionElement
         const inputs = this.inputsDiv.getElementsByTagName("input");
         for (let i = 0; i < inputs.length; ++i) {
             inputs[i].value = (this.answer.value as string[])[i];
+        }
+    }
+
+    showSolution(): void
+    {
+        const inputs = this.inputsDiv.getElementsByTagName("input");
+
+        const solutionDiv = document.createElement("div");
+
+        for (let i = 0; i < this.solution.value!.length; ++i) {
+            if (this.solution.value![i] === this.answer.value![i])
+                inputs[i].style.color = "lime";
+            else {
+                inputs[i].style.color = "red";
+                solutionDiv.innerHTML += `${i+1}: <span style='color: lime;'>${this.solution.value![i]}</span> `;
+            }
+        }
+
+        if (solutionDiv.innerHTML) {
+            solutionDiv.innerHTML = "Točni odgovori: " + solutionDiv.innerHTML;
+            this.inputsDiv.appendChild(solutionDiv);
         }
     }
 }

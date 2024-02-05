@@ -7,7 +7,8 @@ interface IDocumentData
     type: string,
     passwordHash: string,
     deadlineDatetime: string,
-    documentJSON?: string       // deleted after moving into documentContent
+    documentJSON?: string,       // deleted after moving into documentContent
+    solutionJSON?: string,      // TODO: security!
     ID: number,
     submissionID: string,
     generatingMode?: string,
@@ -36,6 +37,7 @@ let grades: IGradingData[];
 /** localStorage variable name for locally saved user form submission. */
 let answersLSName: string;
 let submission: ISubmissionData | null = null;
+export let solutions: IAnswerData[] | null = null;
 
 /** Fetch required document data from DB. */
 async function fetchDocument(documentID: string): Promise<IDocumentData>
@@ -177,6 +179,9 @@ async function init(): Promise<void>
     // Move the document content from the metadata into its separate object:
     documentContent = JSON.parse(documentMetadata.documentJSON!);
     delete documentMetadata.documentJSON;
+
+    if (documentMetadata.solutionJSON)
+        solutions = JSON.parse(documentMetadata.solutionJSON);
 
     generateDocument();
 }

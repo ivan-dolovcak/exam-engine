@@ -46,7 +46,7 @@ class DB
         ],
         "loadDocument" => [
             "query" => "select `name`, `type`, `passwordHash`, 
-                            `deadlineDatetime`, `documentJSON`
+                            `deadlineDatetime`, `documentJSON`, `solutionJSON`
                         from `Document`
                         where `ID` = ?",
             "types" => "i"
