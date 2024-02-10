@@ -66,6 +66,10 @@ div.overlay {
     justify-content: center;
 }
 
+td, th {
+    padding: 5px;
+}
+
 .form {
     position: relative;
     background: $color-bg;

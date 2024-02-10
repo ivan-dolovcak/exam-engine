@@ -4,19 +4,35 @@ $db->execStmt("loadSubmissionsMetadata", $_SESSION["userID"]);
 $sqlResult = $db->stmt->get_result();
 $submissions = $sqlResult->fetch_all(MYSQLI_ASSOC);
 
-if (empty($submissions))
-    echo "<p>Nema rješenja.</p>";
-
-foreach ($submissions as $submission) {
-    echo "<div class='document-box'>";
-    $type = $submission["type"] == "exam" ? "ispit" : "obrazac";
-    echo "<h4>{$submission["name"]} [$type]</h4>";
-
-    echo "<p>Predano {$submission["datetimeEnd"]}.</p>";
-
-    $obfSubmissionID = urlencode(Util::obfuscateID($submission["ID"]));
-    echo "<a href='/views/document.php?submissionID=$obfSubmissionID&mode=review'>
-        Otvori</a>";
-
-    echo "</div>";
+if (empty($submissions)) {
+    echo "<p>Nema dokumenta.</p>";
+    return;
 }
+?>
+
+<table>
+<tr>
+    <th>Naziv</th>
+    <th>Tip</th>
+    <th>Kraj</th>
+    <th></th>
+</tr>
+
+<?php
+foreach ($submissions as $submission) {
+    $obfSubmissionID = urlencode(Util::obfuscateID($submission["ID"]));
+
+    if (! isset($document["deadlineDatetime"]))
+        $document["deadlineDatetime"] = "n/a";
+
+    $rowHTML = "<tr>
+        <td>{$submission["name"]}</td>
+        <td>{$submission["type"]}</td>
+        <td>{$submission["datetimeEnd"]}</td>
+        <td><button onclick='location.href=\"/views/document.php?submissionID=$obfSubmissionID&mode=review\"'>Vidi</button></td>
+    </tr>";
+
+    echo $rowHTML;
+}
+?>
+</table>
