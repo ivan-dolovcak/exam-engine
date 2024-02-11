@@ -34,7 +34,7 @@ class DB
         ],
         "createDocument" => [
             "query" => "insert into `Document`
-                        values (default, ?, ?, ?, ?, ?, default, null, null)",
+                        values (default, ?, ?, default, ?, default, ?, ?, default, null, null)",
             "types" => "sssis"
         ],
         "loadDocumentsMetadata" => [
