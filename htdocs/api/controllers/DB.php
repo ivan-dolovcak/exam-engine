@@ -11,73 +11,93 @@ class DB
      * used for prepared statements.
      */
     public const SQL_QUERIES = [
-        "register" => [
-            "query" => "insert into `User`
-                        values (default, ?, ?, ?, ?, ?, default, default);",
-            "types" => "sssss"
-        ],
+    // Loading
         "login" => [
-            "query" => "select `ID` from `User`
-                        where `email` = ? or `username` = ?;",
+            "query" => "
+                select `ID` from `User`
+                where `email` = ? or `username` = ?",
             "types" => "ss"
         ],
         "loadUser" => [
-            "query" => "select * from `User`
-                        where `ID` = ?;",
-            "types" => "i"
-        ],
-        "touchLastLoginDatetime" => [
-            "query" => "update `User`
-                        set `lastLoginDatetime` = utc_timestamp()
-                        where `ID`= ?;",
-            "types" => "i"
-        ],
-        "createDocument" => [
-            "query" => "insert into `Document`
-                        values (default, ?, ?, default, ?, default, ?, ?, default, null, null)",
-            "types" => "sssis"
-        ],
-        "loadDocumentsMetadata" => [
-            "query" => "select `ID`, `name`, `type`, `visibility`, `passwordHash`, `numMaxSubmissions`, `authorID`, 
-                            `deadlineDatetime`, `creationDate`
-                        from `Document`
-                        where `authorID` = ?",
-            "types" => "i"
-        ],
-        "loadDocument" => [
-            "query" => "select *, json_length(documentJSON) as `numQuestions`, json_extract(documentJSON, '$[*].points') as `points`
-                        from `Document`
-                        where `ID` = ?",
-            "types" => "i"
-        ],
-        "createSubmission" => [
-            "query" => "insert into `Submission`
-                        values (default, ?, ?, ?, default, ?, default)",
-            "types" => "iiss"
-        ],
-        "loadSubmissionsMetadata" => [
-            "query" => "select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
-                        from `Submission` as s
-                        inner join `Document` as d
-                        on d.`ID` = `documentID`
-                        where `userID` = ?",
+            "query" => "
+                select * from `User`
+                where `ID` = ?",
             "types" => "i"
         ],
         "loadSubmission" => [
-            "query" => "select * from `Submission`
-                        where `ID` = ?",
+            "query" => "
+                select * from `Submission`
+                where `ID` = ?",
+            "types" => "i"
+        ],
+        "loadSubmissionsMetadata" => [
+            "query" => "
+                select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
+                from `Submission` as s
+                inner join `Document` as d
+                on d.`ID` = `documentID`
+                where `userID` = ?",
+            "types" => "i"
+        ],
+        "loadDocumentsMetadata" => [
+            "query" => "
+                select  `ID`, `name`, `type`, `visibility`, `passwordHash`, 
+                        `numMaxSubmissions`, `authorID`, `deadlineDatetime`,
+                        `creationDate`
+                from `Document`
+                where `authorID` = ?",
+            "types" => "i"
+        ],
+        "loadDocument" => [
+            "query" => "
+                select *, json_length(documentJSON) as `numQuestions`,
+                       json_extract(documentJSON, '$[*].points') as `points`
+                from `Document`
+                where `ID` = ?",
             "types" => "i"
         ],
         "loadDocumentSolutions" => [
-            "query" => "select `solutionJSON` from `Document`
-                        where `ID` = ?",
+            "query" => "
+                select `solutionJSON` from `Document`
+                where `ID` = ?",
             "types" => "i"
         ],
+    // Inserting
+        "register" => [
+            "query" => "
+                insert into `User`(`username`, `email`, `passwordHash`,
+                                   `firstName`, `lastName`)
+                values(?, ?, ?, ?, ?)",
+            "types" => "sssss"
+        ],
+        "createDocument" => [
+            "query" => "
+                insert into `Document`(`name`, `type`, `passwordHash`, 
+                                       `authorID`, `deadlineDatetime`)
+                values(?, ?, ?, ?, ?)",
+            "types" => "sssis"
+        ],
+        "createSubmission" => [
+            "query" => "
+                insert into `Submission`(
+                    `documentID`, `userID`, `datetimeStart`, `submissionJSON`)
+                values(?, ?, ?, ?)",
+            "types" => "iiss"
+        ],
+    // Updating
         "addSubmissionGrading" => [
-            "query" => "update `Submission`
-                        set `gradingJSON` = ?
-                        where `ID` = ?",
+            "query" => "
+                update `Submission`
+                set `gradingJSON` = ?
+                where `ID` = ?",
             "types" => "si"
+        ],
+        "touchLastLoginDatetime" => [
+            "query" => "
+                update `User`
+                set `lastLoginDatetime` = utc_timestamp()
+                where `ID`= ?",
+            "types" => "i"
         ],
     ];
 
