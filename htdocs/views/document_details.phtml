@@ -1,0 +1,51 @@
+<?php
+session_start();
+
+if (! isset($_GET["documentID"]))
+    Util::previousPage();
+
+$obfDocumentID = $_GET["documentID"];
+$documentID = Util::deobfuscateID($obfDocumentID);
+$document = json_decode(Document::load($documentID));
+?>
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <?php require_once "head.phtml"; setPageTitle("O nama"); ?>
+</head>
+<body>
+    <header>
+        <?php require_once "header.phtml"; ?>
+    </header>
+
+    <main>
+    <?php echo "<h2><em>{$document->name}</em></h2>"; ?>
+    
+    <h3>Detalji</h3>
+<?php
+echo "<ul>";
+echo "<li>Kreiran: {$document->creationDate}</li>",
+    "<li>Tip dokumenta: {$document->type}</li>",
+    "<li>Vidljivost: {$document->visibility}</li>",
+    "<li>Rok predaje: ", $document->deadlineDatetime ?? "nema", "</li>",
+    "<li>Broj dozvoljenih pokušaja: {$document->numMaxSubmissions}</li>",
+    "<li>Broj pitanja: ", $document->numQuestions ?? 0, "</li>",
+    // TODO: get sum in SQL query:
+    "<li>Broj bodova: ", array_sum(json_decode($document->points)) ?? 0, "</li>";
+
+echo "<button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=answer\"'>Riješi</button>";
+echo "<button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=edit\"'>Uredi</button>";
+echo "</ul>";
+?>
+
+        <h3>Rješenja</h3>
+<?php
+    // Show submissions if public.
+?>
+    </main>
+
+    <footer>
+        <?php require_once "footer.phtml"; ?>
+    </footer>
+</body>
+</html>

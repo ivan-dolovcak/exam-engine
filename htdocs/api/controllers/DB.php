@@ -38,15 +38,14 @@ class DB
             "types" => "sssis"
         ],
         "loadDocumentsMetadata" => [
-            "query" => "select `ID`, `name`, `type`, `passwordHash`, `authorID`, 
+            "query" => "select `ID`, `name`, `type`, `visibility`, `passwordHash`, `numMaxSubmissions`, `authorID`, 
                             `deadlineDatetime`, `creationDate`
                         from `Document`
                         where `authorID` = ?",
             "types" => "i"
         ],
         "loadDocument" => [
-            "query" => "select `name`, `type`, `passwordHash`, 
-                            `deadlineDatetime`, `documentJSON`, `solutionJSON`
+            "query" => "select *, json_length(documentJSON) as `numQuestions`, json_extract(documentJSON, '$[*].points') as `points`
                         from `Document`
                         where `ID` = ?",
             "types" => "i"

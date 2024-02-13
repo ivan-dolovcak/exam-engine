@@ -10,6 +10,8 @@ if (empty($submissions)) {
 }
 ?>
 
+<p>Popis tuđih ispita i obrazaca koje ste predali.</p>
+
 <table>
 <tr>
     <th>Naziv</th>

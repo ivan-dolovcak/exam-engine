@@ -9,15 +9,13 @@ if (empty($documents)) {
     return;
 }
 ?>
+<p>Popis Vaših ispita i obrazaca.</p>
 
 <table>
 <tr>
     <th>Naziv</th>
     <th>Tip</th>
     <th>Rok predaje</th>
-    <th>Kreiran</th>
-    <th></th>
-    <th></th>
 </tr>
 
 <?php
@@ -28,12 +26,9 @@ foreach ($documents as $document) {
         $document["deadlineDatetime"] = "n/a";
 
     $rowHTML = "<tr>
-        <td>{$document["name"]}</td>
+        <td><a href='/views/document_details.phtml?documentID=$obfDocumentID'>{$document["name"]}</a></td>
         <td>{$document["type"]}</td>
         <td>{$document["deadlineDatetime"]}</td>
-        <td>{$document["creationDate"]}</td>
-        <td><button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=answer\"'>Riješi</button></td>
-        <td><button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=edit\"'>Uredi</button></td>
     </tr>";
 
     echo $rowHTML;
