@@ -1,6 +1,14 @@
 <?php
 $db = new DB();
-$db->execStmt("loadDocumentsMetadata", $_SESSION["userID"]);
+
+// Filter documents by current user.
+$query = DB::SQL_QUERIES["loadDocumentsMetadata"]["query"];
+$types = DB::SQL_QUERIES["loadDocumentsMetadata"]["types"];
+
+$query .= " where `authorID` = ?";
+$types .= "i";
+
+$db->execStmtCustom($query, $types, $_SESSION["userID"]);
 $sqlResult = $db->stmt->get_result();
 $documents = $sqlResult->fetch_all(MYSQLI_ASSOC);
 

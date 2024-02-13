@@ -53,7 +53,7 @@ class Submission
         $answers = json_decode($submission->submissionJSON);
         
         $solutions = json_decode(
-            Document::loadSolutions($submission->documentID)->solutionJSON);
+            Document::loadSolution($submission->documentID)->solutionJSON);
 
         $grades = [];
 

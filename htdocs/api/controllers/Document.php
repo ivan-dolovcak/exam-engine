@@ -31,10 +31,10 @@ class Document
         return json_encode($json);
     }
 
-    public static function loadSolutions(int $ID): object
+    public static function loadSolution(int $ID): object
     {
         $db = new DB();
-        $db->execStmt("loadDocumentSolutions", $ID);
+        $db->execStmt("loadDocumentSolution", $ID);
         
         $sqlResult = $db->stmt->get_result();
         return $sqlResult->fetch_object();

@@ -30,33 +30,31 @@ class DB
                 where `ID` = ?",
             "types" => "i"
         ],
-        "loadSubmissionsMetadata" => [
+        "loadSubmissionsMetadata" => [ // dynamic
             "query" => "
                 select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
                 from `Submission` as s
                 inner join `Document` as d
-                on d.`ID` = `documentID`
-                where `userID` = ?",
-            "types" => "i"
+                on d.`ID` = `documentID`",
+            "types" => ""
         ],
-        "loadDocumentsMetadata" => [
+        "loadDocumentsMetadata" => [ // dynamic
             "query" => "
                 select  `ID`, `name`, `type`, `visibility`, `passwordHash`, 
                         `numMaxSubmissions`, `authorID`, `deadlineDatetime`,
-                        `creationDate`
-                from `Document`
-                where `authorID` = ?",
-            "types" => "i"
+                        `creationDate`,
+                        json_length(documentJSON) as `numQuestions`,
+                        json_extract(documentJSON, '$[*].points') as `points`
+                from `Document`",
+            "types" => ""
         ],
         "loadDocument" => [
             "query" => "
-                select *, json_length(documentJSON) as `numQuestions`,
-                       json_extract(documentJSON, '$[*].points') as `points`
-                from `Document`
+                select * from `Document`
                 where `ID` = ?",
             "types" => "i"
         ],
-        "loadDocumentSolutions" => [
+        "loadDocumentSolution" => [
             "query" => "
                 select `solutionJSON` from `Document`
                 where `ID` = ?",
@@ -128,9 +126,18 @@ class DB
      */
     public function execStmt(string $queryName, mixed ...$queryArgs): void
     {
-        $queryPair = self::SQL_QUERIES[$queryName];
-        $this->stmt = $this->conn->prepare($queryPair["query"]);
-        $this->stmt->bind_param($queryPair["types"], ...$queryArgs);
+        $query = self::SQL_QUERIES[$queryName]["query"];
+        $types = self::SQL_QUERIES[$queryName]["types"];
+        
+        self::execStmtCustom($query, $types, ...$queryArgs);
+    }
+
+    public function execStmtCustom(
+        string $query, string $types, mixed ...$queryArgs): void
+    {
+        $this->stmt = $this->conn->prepare($query);
+        if (! empty($types))
+            $this->stmt->bind_param($types, ...$queryArgs);
         $this->stmt->execute();
     }
 

@@ -1,11 +1,19 @@
 <?php
 $db = new DB();
-$db->execStmt("loadSubmissionsMetadata", $_SESSION["userID"]);
+
+// Filter documents by current user.
+$query = DB::SQL_QUERIES["loadSubmissionsMetadata"]["query"];
+$types = DB::SQL_QUERIES["loadSubmissionsMetadata"]["types"];
+
+$query .= " where `userID` = ?";
+$types .= "i";
+
+$db->execStmtCustom($query, $types, $_SESSION["userID"]);
 $sqlResult = $db->stmt->get_result();
 $submissions = $sqlResult->fetch_all(MYSQLI_ASSOC);
 
 if (empty($submissions)) {
-    echo "<p>Nema dokumenta.</p>";
+    echo "<p>Nema rješenja.</p>";
     return;
 }
 ?>
