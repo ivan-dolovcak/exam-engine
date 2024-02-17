@@ -32,10 +32,14 @@ class DB
         ],
         "loadSubmissionsMetadata" => [ // dynamic
             "query" => "
-                select s.`ID`, `datetimeEnd`, d.`name`, d.`type`
+                select s.`ID`, `datetimeStart`, `datetimeEnd`, d.`name`, d.`type`, `correctPoints`,
+                       concat(u.`firstName`, ' ', u.`lastName`) as `fullName`,
+                       timediff(`datetimeEnd`, `datetimeStart`) as `solvingDuration`
                 from `Submission` as s
                 inner join `Document` as d
-                on d.`ID` = `documentID`",
+                on d.`ID` = s.`documentID`
+                inner join `User` as u
+                on u.`ID` = s.`userID`",
             "types" => ""
         ],
         "loadDocumentsMetadata" => [ // dynamic
@@ -60,6 +64,26 @@ class DB
                 where `ID` = ?",
             "types" => "i"
         ],
+        "loadUnfinishedSubmittionID" => [
+            "query" => "
+                select `ID` from `Submission`
+                where `datetimeEnd` is null
+                      and `documentID` = ?
+                      and `userID` = ?",
+            "types" => "ii"
+        ],
+    // Statistics
+        "getNumSubmissionsLeft" => [
+            "query" => "
+                select (cast(d.`numMaxSubmissions` as signed) - count(*)) as `numSubmissions`
+                from `Submission` as s
+                inner join `Document` as d
+                    on d.`ID` = s.`documentID`
+                where `documentID` = ? 
+                      and `userID` = ?
+            ",
+            "types" => "ii"
+        ],
     // Inserting
         "register" => [
             "query" => "
@@ -77,18 +101,26 @@ class DB
         ],
         "createSubmission" => [
             "query" => "
-                insert into `Submission`(
-                    `documentID`, `userID`, `datetimeStart`, `submissionJSON`)
-                values(?, ?, ?, ?)",
-            "types" => "iiss"
+                insert into `Submission`(`documentID`, `userID`)
+                values(?, ?)",
+            "types" => "ii"
         ],
     // Updating
+        "finishSubmission" => [
+            "query" => "
+                update `Submission`
+                set `submissionJSON` = ?,
+                    `datetimeEnd` = utc_timestamp()
+                where `ID` = ?
+            ",
+            "types" => "si"
+        ],
         "addSubmissionGrading" => [
             "query" => "
                 update `Submission`
-                set `gradingJSON` = ?
+                set `gradingJSON` = ?, `correctPoints` = ?
                 where `ID` = ?",
-            "types" => "si"
+            "types" => "sii"
         ],
         "touchLastLoginDatetime" => [
             "query" => "
@@ -101,7 +133,7 @@ class DB
 
     public readonly mysqli $conn;
     // Using prepared statements as basic protection against SQL injection:
-    public readonly mysqli_stmt $stmt;
+    public mysqli_stmt $stmt;
     
     
     /** Create a connection to the database. */
@@ -147,7 +179,8 @@ class DB
      */
     public function __destruct()
     {
-        $this->stmt->close();
+        if (isset($this->stmt))
+            $this->stmt->close();
         $this->conn->close();
     }
 }

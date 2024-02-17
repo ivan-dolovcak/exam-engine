@@ -20,6 +20,33 @@ class Document
         }
     }
 
+    public static function getNumSubmissionsLeft(int $ID): ?int
+    {
+        $db = new DB();
+        $db->execStmt("getNumSubmissionsLeft", $ID, $_SESSION["userID"]);
+        $numSubmissions = $db->stmt->get_result()->fetch_array()["numSubmissions"];
+
+        return $numSubmissions;
+    }
+
+    public static function isSubmittingAllowed(int $ID): bool
+    {
+        $document = json_decode(self::load($ID));
+
+        if (isset($document->deadlineDatetime)
+                && time() > strtotime($document->deadlineDatetime))
+            return false;
+        if ($document->authorID === $_SESSION["userID"]
+                && $document->visibility !== "public")
+            return false;
+        if (Submission::loadUnfinishedID($ID))
+            return true;
+        if ((self::getNumSubmissionsLeft($ID)) === 0)
+            return false;
+
+        return true;
+    }
+
     public static function load(int $ID): string
     {
         $db = new DB();

@@ -1,9 +1,16 @@
 <?php
 session_start();
 
+if (isset($_GET["documentID"]))
+    $documentID = Util::deobfuscateID($_GET["documentID"]);
+else
+    $documentID = null;
+if (isset($documentID) && ! Document::isSubmittingAllowed($documentID)
+        && ($_GET["mode"] ?? null) === "answer")
+    die("forbidden");
+
 // For passing the document metadata to JS:
 if (isset($_GET["loadDocument"])) {
-    $documentID = Util::deobfuscateID($_GET["documentID"]);
     $documentJSON = Document::load($documentID);
     echo $documentJSON;
     die;

@@ -26,24 +26,56 @@ $document = $sqlResult->fetch_all(MYSQLI_ASSOC)[0];
     
     <h3>Detalji</h3>
 <?php
+$numSubmissionsLeft = Document::getNumSubmissionsLeft($documentID) ?? $document["numMaxSubmissions"];
 echo "<ul>";
 echo "<li>Kreiran: {$document["creationDate"]}</li>",
     "<li>Tip dokumenta: {$document["type"]}</li>",
     "<li>Vidljivost: {$document["visibility"]}</li>",
     "<li>Rok predaje: ", $document["deadlineDatetime"] ?? "nema", "</li>",
-    "<li>Broj dozvoljenih pokušaja: {$document["numMaxSubmissions"]}</li>",
+    "<li>Broj dozvoljenih pokušaja: $numSubmissionsLeft/{$document["numMaxSubmissions"]}</li>",
     "<li>Broj pitanja: ", $document["numQuestions"] ?? 0, "</li>",
     // TODO: get sum in SQL query:
     "<li>Broj bodova: ", array_sum(json_decode($document["points"])) ?? 0, "</li>";
 
-echo "<button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=answer\"'>Riješi</button>";
+if (Document::isSubmittingAllowed($documentID))
+    echo "<button onclick='location.href=\"/api/submission_process.php?documentID={$obfDocumentID}&start\"'>Riješi</button>";
 echo "<button onclick='location.href=\"/views/document.php?documentID=$obfDocumentID&mode=edit\"'>Uredi</button>";
 echo "</ul>";
 ?>
 
         <h3>Rješenja</h3>
 <?php
-    // Show submissions if public.
+$db = new DB();
+
+// Filter solutions by current document.
+$query = DB::SQL_QUERIES["loadSubmissionsMetadata"]["query"];
+$types = DB::SQL_QUERIES["loadSubmissionsMetadata"]["types"];
+
+$query .= " where `documentID` = ?";
+$types .= "i";
+
+$db->execStmtCustom($query, $types, $documentID);
+$sqlResult = $db->stmt->get_result();
+$submissions = $sqlResult->fetch_all(MYSQLI_ASSOC);
+
+if (empty($submissions)) {
+    echo "<p>Nema rješenja.</p>";
+    return;
+}
+
+// Output into table.
+echo "<table>";
+
+$headers = ["Puno ime", "Predano", "Bodovi", "Trajanje"];
+echo "<tr><th>", implode("</th><th>", $headers), "</th></tr>";
+
+foreach ($submissions as $submission) {
+    $cells = [$submission["fullName"], $submission["datetimeEnd"], 
+        $submission["correctPoints"], $submission["solvingDuration"]];
+    echo "<tr><td>", implode("</td><td>", $cells), "</td></tr>";
+}
+
+echo "</table>";
 ?>
     </main>
 

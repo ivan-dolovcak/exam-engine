@@ -18,13 +18,12 @@ if (empty($submissions)) {
 }
 ?>
 
-<p>Popis tuđih ispita i obrazaca koje ste predali.</p>
-
 <table>
 <tr>
     <th>Naziv</th>
     <th>Tip</th>
-    <th>Kraj</th>
+    <th>Bodovi</th>
+    <th>Početak</th>
     <th></th>
 </tr>
 
@@ -38,7 +37,8 @@ foreach ($submissions as $submission) {
     $rowHTML = "<tr>
         <td>{$submission["name"]}</td>
         <td>{$submission["type"]}</td>
-        <td>{$submission["datetimeEnd"]}</td>
+        <td>{$submission["correctPoints"]}</td>
+        <td>{$submission["datetimeStart"]}</td>
         <td><button onclick='location.href=\"/views/document.php?submissionID=$obfSubmissionID&mode=review\"'>Vidi</button></td>
     </tr>";
 

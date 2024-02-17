@@ -1,16 +1,14 @@
 <?php
 class Submission
 {
-    public static function create(int $documentID, int $userID,
-        string $datetimeStart, string $submissionJSON): int
+    public static function create(int $documentID, int $userID): int
     {
         $db = new DB();
         
         try {
-            $db->execStmt("createSubmission", $documentID, $userID, 
-                $datetimeStart, $submissionJSON);
+            $db->execStmt("createSubmission", $documentID, $userID);
             
-            return mysqli_insert_id($db->conn);
+            return $db->conn->insert_id;
         }
         catch (mysqli_sql_exception $e) {
             $_SESSION["formMsg"] = "Greška baze podataka: " . $e->getMessage() 
@@ -18,6 +16,12 @@ class Submission
 
             return false;
         }
+    }
+
+    public static function finish(string $submissionJSON): void
+    {
+        $db = new DB();
+        $db->execStmt("finishSubmission", $submissionJSON);
     }
 
     public static function load(int $ID): string
@@ -31,6 +35,17 @@ class Submission
         $json["documentID"] = Util::obfuscateID($json["documentID"]);
 
         return json_encode($json);
+    }
+
+    public static function loadUnfinishedID(int $documentID): int | false
+    {
+        $db = new DB();
+        $db->execStmt("loadUnfinishedSubmittionID", $documentID, $_SESSION["userID"]);
+        $result = $db->stmt->get_result()->fetch_assoc();
+        if (empty($result))
+            return false;
+
+        return $result["ID"];
     }
 
     private static function findByID(int $ID, array &$array): object | false
@@ -56,6 +71,7 @@ class Submission
             Document::loadSolution($submission->documentID)->solutionJSON);
 
         $grades = [];
+        $correctPoints = 0;
 
         foreach ($solutions as $solution) {
             $question = self::findByID($solution->ID, $questions);
@@ -83,11 +99,12 @@ class Submission
             else
                 $grade = intval($solution->value === $answer->value);
 
+            $correctPoints += $grade;
             array_push($grades, ["ID" => $solution->ID, "points" => $grade]);
         }
 
         $db = new DB();
-        $db->execStmt("addSubmissionGrading", json_encode($grades),
-            $submission->ID);
+        $db->execStmt("addSubmissionGrading", json_encode($grades), 
+            $correctPoints, $submission->ID);
     }
 }

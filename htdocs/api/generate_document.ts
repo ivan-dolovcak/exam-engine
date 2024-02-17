@@ -124,7 +124,7 @@ function clearAnswers(): void
 async function submitAnswers(): Promise<void>
 {
     await fetch(
-        `/api/submit_document.php?documentID=${documentMetadata.ID}&documentType=${documentMetadata.type}`,
+        `/api/submission_process.php?documentID=${documentMetadata.ID}&documentType=${documentMetadata.type}`,
     {
         method: "post",
         headers: {
