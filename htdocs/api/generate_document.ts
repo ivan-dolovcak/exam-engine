@@ -36,6 +36,9 @@ let answers: IAnswerData[] = [];
 let grades: IGradingData[];
 /** localStorage variable name for locally saved user form submission. */
 let answersLSName: string;
+export let contentLSName: string;
+// New questions created in editing mode:
+export let documentContentNew: IQuestionData[];
 let submission: ISubmissionData | null = null;
 export let solutions: IAnswerData[] | null = null;
 
@@ -53,6 +56,24 @@ async function fetchSubmission(): Promise<ISubmissionData>
     const response = await fetch(`${location.href}&loadSubmission`);
     const json = await response.json();
     return json;
+}
+
+export function generateNewQuestionBtn(newQuestionOrdinal: number = 0): HTMLDivElement
+{
+    // Clone the dropdown template
+    const template = document.getElementById("new-question-btn-template") as HTMLTemplateElement;
+    const clone = template.content.cloneNode(true) as HTMLDivElement;
+
+    // Add event listeners to the options
+    for (const option of clone.querySelectorAll(".dropdown-option")) {
+        option.addEventListener("click", () => {
+            const questionElement = QuestionElement.generateEmpty(option.innerHTML);
+            option.parentElement!.parentElement!.replaceWith(questionElement!);
+            saveQuestion(questionElement!.data);
+        });
+    }
+    
+    return clone;
 }
 
 /** Dynamically generate all document elements. */
@@ -142,6 +163,28 @@ async function submitAnswers(): Promise<void>
     });
 }
 
+export function saveQuestion(question: IQuestionData)
+{
+    // Load
+    const localQuestionsJSON: string | null
+        = localStorage.getItem(contentLSName);
+    
+    const localQuestions: IQuestionData[] = JSON.parse(localQuestionsJSON ?? "[]");   
+
+    // Modify
+    let oldQuestionIndex: number
+        = localQuestions.findIndex(q => q.ID === question.ID);
+    
+    if (oldQuestionIndex === -1)
+        localQuestions.push(question);
+    else
+        localQuestions[oldQuestionIndex] = question;        
+    
+    // Save
+    localStorage.setItem(contentLSName, JSON.stringify(localQuestions));
+    console.log("Saved modified question locally.")
+}
+
 async function init(): Promise<void>
 {
     // Obfuscated document ID and generating mode are passed in GET:
@@ -180,6 +223,24 @@ async function init(): Promise<void>
     documentContent = JSON.parse(documentMetadata.documentJSON!);
     delete documentMetadata.documentJSON;
 
+    if (documentMetadataGET.generatingMode === "edit") {
+        contentLSName = `${documentMetadataGET.ID}content`;
+        // Load modified document content (in edit mode)
+        const newDocumentContent: IQuestionData[]
+            = JSON.parse(localStorage.getItem(contentLSName) ?? "[]");
+
+        for (const newQuestion of newDocumentContent) {
+            let oldQuestionIndex = documentContent.findIndex(q => q.ID === newQuestion.ID);
+            if (oldQuestionIndex !== -1) {
+                documentContent[oldQuestionIndex] = newQuestion;
+            }
+            else
+                documentContent.push(newQuestion);
+        }
+
+        answers = JSON.parse(documentMetadata.solutionJSON!);
+    }
+
     if (documentMetadata.solutionJSON)
         solutions = JSON.parse(documentMetadata.solutionJSON);
 
@@ -187,3 +248,4 @@ async function init(): Promise<void>
 }
 
 window.addEventListener("load", init);
+document.addEventListener("contextmenu", (e) => { e.preventDefault(); });

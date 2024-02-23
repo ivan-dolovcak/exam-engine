@@ -21,7 +21,7 @@ form#questions-box{
     -webkit-user-select: none; // Safari
     gap: 1.5rem;
     // Question box
-    & > div {
+    & > div.question {
         div.header {
             display: flex;
         }
@@ -116,4 +116,50 @@ label.multi-container {
     span.radio {
         border-radius: 50%;
     }
+}
+
+.new-question-btn {
+    width: fit-content;
+    position: relative;
+    margin: auto;
+    border: 1px solid $color-accent;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: $color-accent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dropdown {
+    width: fit-content;
+    margin: auto;
+    position: relative;
+    display: inline-block;
+  }
+  
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content div {
+    color: black;
+    padding: 6px 8px;
+    font-size: .9rem;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content div:hover {
+    background-color: #f1f1f1;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
 }

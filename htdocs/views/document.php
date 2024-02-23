@@ -38,6 +38,7 @@ if (! in_array($_GET["mode"], ["answer", "edit", "review"], strict:true))
     <?php require_once "head.phtml"; setPageTitle("Pregled dokumenta"); ?>
     
     <?php require_once "{$_SERVER["DOCUMENT_ROOT"]}/partials/question_template.html"; ?>
+    <?php require_once "{$_SERVER["DOCUMENT_ROOT"]}/partials/new_question_btn_template.html"; ?>
 
     <link rel="stylesheet" href="/static/document.css">
     

@@ -1,4 +1,4 @@
-import { documentMetadata, IGradingData, saveAnswersLocal, solutions } from "./generate_document.js";
+import { documentMetadata, IGradingData, saveAnswersLocal, solutions, generateNewQuestionBtn, saveQuestion } from "./generate_document.js";
 
 /** Every question element has this data object bound to it. */
 export interface IQuestionData
@@ -22,24 +22,17 @@ export interface IAnswerData
 
 export abstract class QuestionElement extends HTMLDivElement
 {
-    protected data: IQuestionData;
-    protected inputsDiv: HTMLDivElement;
+    public data: IQuestionData;
     protected answer: IAnswerData;
     protected grade: IGradingData | undefined;
     protected solution: IAnswerData;
-
+    protected inputsDiv: HTMLDivElement;
+    protected titleEl: HTMLHeadElement;
 
     abstract saveAnswer(): void;
     abstract loadAnswer(): void;
     abstract showSolution(): void;
 
-    set headerTitle(title: string)
-    {
-        const titleEl
-            = this.getElementsByClassName("title")[0] as HTMLHeadingElement;
-        titleEl.innerText = title;
-        this.data.title = title;
-    }
 
     constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
@@ -48,7 +41,7 @@ export abstract class QuestionElement extends HTMLDivElement
         this.answer = answer;
         this.grade = grade;
 
-        this.solution= solutions!.find(solution => solution.ID === this.data.ID)!;
+        this.solution = solutions!.find(solution => solution.ID === this.data.ID)!;
    
         // Create question box from HTML template.
         const questionTemplate = document.getElementById(
@@ -59,8 +52,19 @@ export abstract class QuestionElement extends HTMLDivElement
 
         this.inputsDiv
             = this.getElementsByClassName("inputs")[0] as HTMLDivElement;
+        
+        this.titleEl
+            = this.getElementsByClassName("title")[0] as HTMLHeadingElement;
+        this.titleEl.innerText = this.data.title;
 
-        this.headerTitle = this.data.title;
+        // Add total points
+        const gradeDiv
+            = this.getElementsByClassName("grade")[0] as HTMLDivElement;
+        
+        if (documentMetadata.generatingMode === "review")
+            gradeDiv.innerText = (grade?.points ?? "?") + " / " + data.points;
+        else
+            gradeDiv.innerText = "_ / " + data.points;
 
         if (documentMetadata.generatingMode === "review") {
             // Add points (grades)
@@ -81,15 +85,39 @@ export abstract class QuestionElement extends HTMLDivElement
                 else
                     this.classList.add("partially");
             }
-
-            const gradeDiv
-                = this.getElementsByClassName("grade")[0] as HTMLDivElement;
-            gradeDiv.innerText = (grade?.points ?? "?") + "/" + data.points;
+        }
+        else if (documentMetadata.generatingMode === "edit") {
+            // Create editable title
+            this.titleEl.addEventListener("click", () => {
+                this.titleEl.contentEditable = "true";
+                this.titleEl.focus();
+            });
+            this.titleEl.addEventListener("blur", () => {
+                this.data.title = this.titleEl.innerText;
+                saveQuestion(this.data);
+            });
         }
     }
 
     connectedCallback()
     {
+        // Calculate ordinal
+        if (this.data.ordinal === -1) {
+            const nextSib: Element | null = this.nextElementSibling;
+            const prevSib: Element | null = this.previousElementSibling;
+            console.log(nextSib)
+
+            
+            if (! prevSib) // Top (has to be positive)
+                this.data.ordinal = (nextSib as QuestionElement).data.ordinal / 2;
+            else if (! nextSib) // Bottom
+                this.data.ordinal = (prevSib as QuestionElement).data.ordinal + 1;
+            else // Middle (take avg)
+                this.data.ordinal = (
+                    (prevSib as QuestionElement).data.ordinal
+                    + (nextSib as QuestionElement).data.ordinal) / 2;
+        }
+
         type InputLike
             = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         const inputs: NodeListOf<InputLike>
@@ -117,6 +145,25 @@ export abstract class QuestionElement extends HTMLDivElement
                 input.parentElement?.style.setProperty("cursor", "default");
             }
         }
+
+        // In edit mode, all correct answers must exist (except for optional
+        // questions.)
+        if (documentMetadata.generatingMode === "edit" && this.data.required) {
+            for (const input of inputs)
+                input.required = true;
+        }
+
+        if (documentMetadata.generatingMode !== "edit")
+            return;
+        // Generate "new question" button(s):
+        if (this.previousElementSibling instanceof QuestionElement
+            || this.previousElementSibling === null)
+            this.parentElement!.insertBefore(generateNewQuestionBtn(), this);
+        if (this.nextElementSibling instanceof QuestionElement)
+            this.parentElement!.insertBefore(generateNewQuestionBtn(), this.nextElementSibling);
+            
+        if (this.parentElement!.lastElementChild instanceof QuestionElement)
+            this.parentElement?.appendChild(generateNewQuestionBtn());
     }
 
     /** Uses a corresponding ctor for the question type. */
@@ -138,8 +185,31 @@ export abstract class QuestionElement extends HTMLDivElement
         case "fillIn":
             questionElement = new FillIn(question, answer, grade);
         }
-        
+
         return questionElement;
+    }
+
+    static generateEmpty(questionType: string): QuestionElement | undefined
+    {
+        const ID = Math.random();
+        const title = "[naslov pitanja]";
+        const required = documentMetadata.type === "exam";
+        let points = 0;
+        
+        const questionData: IQuestionData = { ID: ID, title: title, required: required, points: points, type: questionType, ordinal: -1 };
+        
+        switch (questionType) {
+            case "shortAnswer":
+                break;
+            case "singleChoice": case "multiChoice":
+                questionData.offeredAnswers = ["1. odgovor", "2. odgovor"];
+            case "longAnswer":
+                break;
+            case "fillIn":
+                break;
+        }
+
+        return QuestionElement.generate(questionData, { ID: ID, value: null }, undefined);
     }
 }
 
