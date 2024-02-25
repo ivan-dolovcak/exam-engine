@@ -88,6 +88,9 @@ function generateDocument(): void
         = document.getElementById("questions-box") as HTMLFormElement | null;
     
     for (const questionData of documentContent) {
+        if (questionData.deleted)
+            continue;
+
         // Find the user's corresponding answer to the current question:
         let answerData: IAnswerData | undefined = answers.find(
             answer => answer.ID === questionData.ID);

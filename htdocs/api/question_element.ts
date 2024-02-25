@@ -12,6 +12,7 @@ export interface IQuestionData
     needsManualGrading?: boolean,
     required?: boolean,
     points: number,
+    deleted?: boolean;
 }
 
 export interface IAnswerData
@@ -93,6 +94,16 @@ export abstract class QuestionElement extends HTMLDivElement
             this.titleEl.addEventListener("blur", () => {
                 this.data.title = this.titleEl.innerText;
                 saveQuestion(this.data);
+            });
+            // Add deleting questions
+            this.titleEl.addEventListener("contextmenu", () => {
+                this.data.deleted = true;
+                saveQuestion(this.data);
+
+                if (! (this.previousElementSibling instanceof QuestionElement))
+                    this.previousElementSibling?.remove();
+
+                this.remove();
             });
         }
     }
