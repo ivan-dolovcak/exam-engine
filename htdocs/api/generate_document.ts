@@ -58,7 +58,7 @@ async function fetchSubmission(): Promise<ISubmissionData>
     return json;
 }
 
-export function generateNewQuestionBtn(newQuestionOrdinal: number = 0): HTMLDivElement
+export function generateNewQuestionBtn(): HTMLDivElement
 {
     // Clone the dropdown template
     const template = document.getElementById("new-question-btn-template") as HTMLTemplateElement;
@@ -211,7 +211,7 @@ async function init(): Promise<void>
         const localAnswers = localStorage.getItem(answersLSName);
         if (localAnswers !== null)
             answers = JSON.parse(localAnswers);
-    }
+        }
 
     // Merge metadata from GET and from DB:
     documentMetadata = {
@@ -238,7 +238,8 @@ async function init(): Promise<void>
                 documentContent.push(newQuestion);
         }
 
-        answers = JSON.parse(documentMetadata.solutionJSON!);
+        if (answers === null || answers.length === 0)
+            answers = JSON.parse(documentMetadata.solutionJSON!);
     }
 
     if (documentMetadata.solutionJSON)

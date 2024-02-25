@@ -58,13 +58,11 @@ export abstract class QuestionElement extends HTMLDivElement
         this.titleEl.innerText = this.data.title;
 
         // Add total points
-        const gradeDiv
-            = this.getElementsByClassName("grade")[0] as HTMLDivElement;
-        
         if (documentMetadata.generatingMode === "review")
-            gradeDiv.innerText = (grade?.points ?? "?") + " / " + data.points;
-        else
-            gradeDiv.innerText = "_ / " + data.points;
+            this.getElementsByClassName("correct-points")[0]
+                .innerHTML = (this.grade?.points, toString() ?? "?");
+        
+        this.updateTotalPoints();
 
         if (documentMetadata.generatingMode === "review") {
             // Add points (grades)
@@ -99,14 +97,18 @@ export abstract class QuestionElement extends HTMLDivElement
         }
     }
 
+    updateTotalPoints(): void
+    {
+        this.getElementsByClassName("total-points")[0]
+            .innerHTML = this.data.points.toString();
+    }
+
     connectedCallback()
     {
         // Calculate ordinal
         if (this.data.ordinal === -1) {
             const nextSib: Element | null = this.nextElementSibling;
             const prevSib: Element | null = this.previousElementSibling;
-            console.log(nextSib)
-
             
             if (! prevSib) // Top (has to be positive)
                 this.data.ordinal = (nextSib as QuestionElement).data.ordinal / 2;
@@ -124,7 +126,8 @@ export abstract class QuestionElement extends HTMLDivElement
             = this.inputsDiv.querySelectorAll("input, textarea, select");
         
         // Add autosave to all inputs.
-        if (documentMetadata.generatingMode !== "review")
+        if (documentMetadata.generatingMode !== "review"
+            && this.data.type !== "fillIn")
             for (const input of inputs)
                 input.addEventListener("blur", () => {
                     this.saveAnswer(); saveAnswersLocal();
@@ -163,7 +166,7 @@ export abstract class QuestionElement extends HTMLDivElement
             this.parentElement!.insertBefore(generateNewQuestionBtn(), this.nextElementSibling);
             
         if (this.parentElement!.lastElementChild instanceof QuestionElement)
-            this.parentElement?.appendChild(generateNewQuestionBtn());
+            this.parentElement!.appendChild(generateNewQuestionBtn());
     }
 
     /** Uses a corresponding ctor for the question type. */
@@ -194,7 +197,7 @@ export abstract class QuestionElement extends HTMLDivElement
         const ID = Math.random();
         const title = "[naslov pitanja]";
         const required = documentMetadata.type === "exam";
-        let points = 0;
+        let points = 1;
         
         const questionData: IQuestionData = { ID: ID, title: title, required: required, points: points, type: questionType, ordinal: -1 };
         
@@ -203,13 +206,17 @@ export abstract class QuestionElement extends HTMLDivElement
                 break;
             case "singleChoice": case "multiChoice":
                 questionData.offeredAnswers = ["1. odgovor", "2. odgovor"];
+                break;
+            case "trueFalse":
+                questionData.offeredAnswers = ["točno", "netočno"];
+                break;
             case "longAnswer":
                 break;
             case "fillIn":
-                break;
+                questionData.partialText = "pitanje \u200e";
         }
 
-        return QuestionElement.generate(questionData, { ID: ID, value: null }, undefined);
+        return QuestionElement.generate(questionData, { ID: ID, value: ["odgovor"] }, undefined);
     }
 }
 
@@ -260,7 +267,6 @@ export class LongAnswer extends QuestionElement
 {
     private input: HTMLTextAreaElement;
 
-
     constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
         super(data, answer, grade);
@@ -292,6 +298,8 @@ export class LongAnswer extends QuestionElement
 
 export class MultiChoice extends QuestionElement
 {
+    private lastEditedOfferedAnswer: string | undefined;
+    
     constructor(data: IQuestionData, answer: IAnswerData, grade: IGradingData | undefined)
     {
         super(data, answer, grade);
@@ -303,38 +311,112 @@ export class MultiChoice extends QuestionElement
             offeredAnswers = this.data.offeredAnswers!;
 
         for (const offeredAnswer of offeredAnswers) {
-            // Custom checkbox/radiobutton generation.
-
-            const radioContainer = document.createElement("label");
-            radioContainer.classList.add("multi-container");
-            radioContainer.innerText = offeredAnswer;
-            radioContainer.htmlFor = this.data.ID.toString() + Math.random();
-            this.inputsDiv.appendChild(radioContainer);
-
-            const radioBtn = document.createElement("input");
-            // The only difference for multiChoice is to use checkboxes:
-            if (this.data.type === "multiChoice")
-                radioBtn.type = "checkbox";
-            else
-                radioBtn.type = "radio";
-
-            radioBtn.value = offeredAnswer;
-            radioBtn.name = this.data.ID.toString();
-            radioBtn.id = radioContainer.htmlFor;
-            radioContainer.appendChild(radioBtn);
-
-            const checkmark: HTMLSpanElement = document.createElement("span");
-            checkmark.classList.add(radioBtn.type);
-            radioContainer.appendChild(checkmark);
+            this.createInput(offeredAnswer);
         }
+
+        if (documentMetadata.generatingMode === "edit"
+                && this.data.type !== "trueFalse")
+        this.appendChild(this.createNewOfferedAnswerBtn());
+    }
+
+    editOfferedAnswer(e: MouseEvent, self: HTMLSpanElement)
+    {
+        this.lastEditedOfferedAnswer = self.innerText;
+        self.contentEditable = "true";
+        self.focus();
+        e.preventDefault();
+    }
+
+    saveOfferedAnswer(self: HTMLSpanElement)
+    {
+        const newOfferedAnswer: string = self.innerText;
+        this.data.offeredAnswers![this.data.offeredAnswers!.indexOf(
+            this.lastEditedOfferedAnswer!)] = newOfferedAnswer;
+        
+        saveQuestion(this.data);
+    }
+
+    deleteOfferedAnswer(self: HTMLSpanElement)
+    {
+        this.data.offeredAnswers!.splice(this.data.offeredAnswers!.indexOf(self.innerText), 1);
+        self.parentElement?.remove();
+        saveQuestion(this.data);
+    }
+
+    createNewOfferedAnswerBtn(): HTMLDivElement
+    {
+        const newOfferedAnswerBtn = document.createElement("div");
+        newOfferedAnswerBtn.innerText = "+";
+        newOfferedAnswerBtn.className = "button";
+        newOfferedAnswerBtn.addEventListener("click", () => {
+            newOfferedAnswerBtn.remove();
+            const newOfferedAnswer: string = "[novi odgovor]";
+            this.createInput(newOfferedAnswer);
+            this.data.offeredAnswers?.push(newOfferedAnswer);
+            saveQuestion(this.data);
+            this.appendChild(this.createNewOfferedAnswerBtn());
+        });
+        return newOfferedAnswerBtn;
+    }
+
+    createInput(offeredAnswer: string)
+    {
+        // Custom checkbox/radiobutton generation.
+        const radioContainer = document.createElement("label");
+        radioContainer.classList.add("multi-container");
+        const offeredAnswerSpan = document.createElement("span");
+        offeredAnswerSpan.innerText = offeredAnswer;
+        radioContainer.appendChild(offeredAnswerSpan);
+        radioContainer.htmlFor = this.data.ID.toString() + Math.random();
+        this.inputsDiv.appendChild(radioContainer);
+
+        // Enable editing
+        if (documentMetadata.generatingMode === "edit"
+            && this.data.type !== "trueFalse") {
+            offeredAnswerSpan.style.cursor = "text";
+
+            const deleteBtn = document.createElement("span");
+            deleteBtn.className = "delete-btn";
+            deleteBtn.innerText = "X";
+            
+            deleteBtn.addEventListener(
+                "click", () => this.deleteOfferedAnswer(offeredAnswerSpan));
+            radioContainer.appendChild(deleteBtn);
+
+            offeredAnswerSpan.addEventListener(
+                "click", (e) => this.editOfferedAnswer(e, offeredAnswerSpan));
+            offeredAnswerSpan.addEventListener(
+                "blur", () => this.saveOfferedAnswer(offeredAnswerSpan));
+        }
+
+        const radioBtn = document.createElement("input");
+        // The only difference for multiChoice is to use checkboxes:
+        if (this.data.type === "multiChoice")
+            radioBtn.type = "checkbox";
+        else
+            radioBtn.type = "radio";
+
+        radioBtn.value = offeredAnswer;
+        radioBtn.name = this.data.ID.toString();
+        radioBtn.id = radioContainer.htmlFor;
+        radioContainer.appendChild(radioBtn);
+
+        const checkmark: HTMLSpanElement = document.createElement("span");
+        checkmark.classList.add(radioBtn.type);
+        radioContainer.appendChild(checkmark);
     }
 
     saveAnswer(): void
     {
         this.answer.value = [];
+        this.data.points = 0;
         for (const radioBtn of this.inputsDiv.getElementsByTagName("input"))
-            if (radioBtn.checked)
+            if (radioBtn.checked) {
                 this.answer.value.push(radioBtn.value);
+                this.data.points++;
+            }
+        
+        this.updateTotalPoints();
         
         if (this.data.type !== "multiChoice")
             this.answer.value = this.answer.value[0] ?? null;
@@ -342,14 +424,15 @@ export class MultiChoice extends QuestionElement
             this.answer.value = null;
     }
 
-    loadAnswer(): void
-    {
+    loadAnswer(): void {
         let answer = this.answer.value;
-        if (! Array.isArray(answer))
+        if (!Array.isArray(answer))
             answer = [answer!];
-        for (const radioBtn of this.inputsDiv.getElementsByTagName("input"))
-            if (answer.includes(radioBtn.value))
+        for (const radioBtn of this.inputsDiv.getElementsByTagName("input")) {
+            if (answer.includes(radioBtn.value)) {
                 radioBtn.checked = true;
+            }
+        }
     }
 
     showSolution(): void
@@ -369,26 +452,90 @@ export class FillIn extends QuestionElement
     {
         super(data, answer, grade);
 
-        const partialText = document.createElement("div");
+        this.inputsDiv.contentEditable = "true";
+        this.inputsDiv.addEventListener("keypress", (ev) => {
+            if (ev.key === "Enter")
+                ev.preventDefault();
+        });
+        this.inputsDiv.addEventListener("contextmenu", (ev) => {
+            if (! this.inputsDiv.isSameNode(ev.target as Node))
+                return;
+            let selection = window.getSelection();
+            let range = selection?.getRangeAt(0);
+            range?.deleteContents();
+            range?.insertNode(this.createInput());
+            this.updatePartialText();
+        });
+        this.inputsDiv.addEventListener("blur", () => { this.updatePartialText() });
+
         const textFragments: string[]
             = this.data.partialText!.split("\u200e");
         
         for (const textFragment of textFragments) {
-            const textFragmentEl = document.createElement("span");
-            textFragmentEl.innerText = textFragment;
-            partialText.appendChild(textFragmentEl);
+            this.inputsDiv.insertAdjacentText("beforeend", textFragment);
 
-            const input = document.createElement("input");
-            input.type = "text";
-            input.name = this.data.ID.toString();
-            input.spellcheck = false;
-            input.autocomplete = "off";
-            partialText.appendChild(input);
+            const input = this.createInput();
+            
+            this.inputsDiv.appendChild(input);
         }
 
-        partialText.lastChild?.remove();
-        
-        this.inputsDiv.appendChild(partialText);
+        this.inputsDiv.lastChild?.remove();
+    }
+
+    createInput(): HTMLInputElement
+    {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = this.data.ID.toString();
+        input.spellcheck = false;
+        input.autocomplete = "off";
+        input.insertAdjacentText("beforebegin", " ");
+        input.insertAdjacentText("afterend", " ");
+        input.addEventListener("blur", () => { this.saveAnswer(); saveAnswersLocal(); });
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.innerHTML = "-";
+        delBtn.style.display = "none";
+        this.inputsDiv.appendChild(delBtn);
+        input.addEventListener("contextmenu", (ev) => {
+            delBtn.style.display = "block";
+            delBtn.style.position = "absolute";
+            delBtn.style.left = ev.clientX + "px";
+            delBtn.style.top = (ev.clientY + window.scrollY) + "px";
+        });
+        delBtn.addEventListener("click", () => {
+            input.remove();
+            delBtn.remove();
+            this.updatePartialText();
+        });
+        input.addEventListener("blur", () => {
+            setTimeout(() => {
+                delBtn.style.display = "none"; 
+            }, 200);
+        });
+        return input;
+    }
+
+    updatePartialText(): void
+    {
+        let newPartialText: string = "";
+        this.data.points = 0;
+        for (const node of this.inputsDiv.childNodes) {
+            if (node instanceof Text)
+                newPartialText += node.data;
+            else if (node instanceof HTMLInputElement) {
+                newPartialText += "\u200e";
+                this.data.points++;
+            }
+                
+        }
+            
+        this.saveAnswer();
+        saveAnswersLocal();
+        this.data.partialText = newPartialText.trim();
+        this.updateTotalPoints();
+        saveQuestion(this.data);
     }
 
     saveAnswer(): void

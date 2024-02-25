@@ -87,8 +87,15 @@ label.multi-container {
     &:hover input:enabled ~ span {
         box-shadow: 0 0 5px 1px $color-accent;
     }
+    .delete-btn {
+        display: none;
+    }
+    &:hover .delete-btn {
+        display: inline;
+    }
     input {
         position: absolute;
+        z-index: -1;
         top: 0;
         right: 0;
         opacity: 0;
