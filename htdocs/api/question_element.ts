@@ -58,11 +58,6 @@ export abstract class QuestionElement extends HTMLDivElement
             = this.getElementsByClassName("title")[0] as HTMLHeadingElement;
         this.titleEl.innerText = this.data.title;
 
-        // Add total points
-        if (documentMetadata.generatingMode === "review")
-            this.getElementsByClassName("correct-points")[0]
-                .innerHTML = (this.grade?.points, toString() ?? "?");
-        
         this.updateTotalPoints();
 
         if (documentMetadata.generatingMode === "review") {
@@ -84,6 +79,10 @@ export abstract class QuestionElement extends HTMLDivElement
                 else
                     this.classList.add("partially");
             }
+
+            // Add total points
+            this.getElementsByClassName("correct-points")[0]
+                .innerHTML = (this.grade?.points?.toString() ?? "?");
         }
         else if (documentMetadata.generatingMode === "edit") {
             // Create editable title
@@ -121,7 +120,9 @@ export abstract class QuestionElement extends HTMLDivElement
             const nextSib: Element | null = this.nextElementSibling;
             const prevSib: Element | null = this.previousElementSibling;
             
-            if (! prevSib) // Top (has to be positive)
+            if (! prevSib && ! nextSib)
+                this.data.ordinal = 10;
+            else if (! prevSib) // Top (has to be positive)
                 this.data.ordinal = (nextSib as QuestionElement).data.ordinal / 2;
             else if (! nextSib) // Bottom
                 this.data.ordinal = (prevSib as QuestionElement).data.ordinal + 1;
@@ -141,7 +142,9 @@ export abstract class QuestionElement extends HTMLDivElement
             && this.data.type !== "fillIn")
             for (const input of inputs)
                 input.addEventListener("blur", () => {
-                    this.saveAnswer(); saveAnswersLocal();
+                    this.saveAnswer();
+                    if (! this.data.deleted)
+                        saveAnswersLocal();
                 });
         
         // Fill questions with user answers.
@@ -361,7 +364,7 @@ export class MultiChoice extends QuestionElement
         newOfferedAnswerBtn.className = "button";
         newOfferedAnswerBtn.addEventListener("click", () => {
             newOfferedAnswerBtn.remove();
-            const newOfferedAnswer: string = "[novi odgovor]";
+            const newOfferedAnswer: string = (this.inputsDiv.children.length + 1) + ". odgovor";
             this.createInput(newOfferedAnswer);
             this.data.offeredAnswers?.push(newOfferedAnswer);
             saveQuestion(this.data);

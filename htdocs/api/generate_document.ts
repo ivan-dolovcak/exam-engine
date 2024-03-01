@@ -30,7 +30,7 @@ export interface IGradingData
 }
 
 export let documentMetadata: IDocumentData;
-let documentContent: IQuestionData[];
+let documentContent: IQuestionData[] = [];
 /** User submitted form data for the specific document questions. */
 let answers: IAnswerData[] = [];
 let grades: IGradingData[];
@@ -40,7 +40,7 @@ export let contentLSName: string;
 // New questions created in editing mode:
 export let documentContentNew: IQuestionData[];
 let submission: ISubmissionData | null = null;
-export let solutions: IAnswerData[] | null = null;
+export let solutions: IAnswerData[] | null = [];
 
 /** Fetch required document data from DB. */
 async function fetchDocument(documentID: string): Promise<IDocumentData>
@@ -112,15 +112,6 @@ function generateDocument(): void
 
         questionsBox?.appendChild(questionElement!);
     }
-
-    if (documentMetadata.generatingMode !== "answer")
-        document.getElementById("questions-box-buttons")?.remove();
-    else {
-        document.getElementById(
-            "clear-answers")?.addEventListener("click", clearAnswers);
-        document.getElementById(
-            "submit-answers")?.addEventListener("click", submitAnswers);
-    }
 }
 
 /** Save user submission locally at all times. */
@@ -138,17 +129,42 @@ export function saveAnswersLocal(): void
     console.log("Saved document answers locally.");
 }
 
-function clearAnswers(): void
+function clearLS(): void
 {
     localStorage.removeItem(answersLSName);
+    localStorage.removeItem(contentLSName);
     location.reload();
+}
+
+async function updateDocument()
+{
+    const clearContent: IQuestionData[]
+        = documentContent.filter(q => !q.deleted);
+
+    let requestURL = `/api/edit_document.php?documentID=${documentMetadata.ID}`;
+    await fetch(requestURL,
+    {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(clearContent)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network error.');
+        }
+    });
 }
 
 /** Store user submission in DB. */
 async function submitAnswers(): Promise<void>
 {
-    await fetch(
-        `/api/submission_process.php?documentID=${documentMetadata.ID}&documentType=${documentMetadata.type}`,
+    let requestURL = `/api/submission_process.php?documentID=${documentMetadata.ID}&documentType=${documentMetadata.type}`;
+    if (documentMetadata.generatingMode === "edit")
+        requestURL += "&edit";
+
+    await fetch(requestURL,
     {
         method: "post",
         headers: {
@@ -159,10 +175,6 @@ async function submitAnswers(): Promise<void>
     .then(response => {
         if (!response.ok)
             throw new Error('Network error.');
-        else {
-            clearAnswers(); // Delete the locally saved answers.
-            location.href = "/views/home.phtml";
-        }
     });
 }
 
@@ -209,7 +221,10 @@ async function init(): Promise<void>
         grades = JSON.parse(submission.gradingJSON);
     }
     else {
-        answersLSName = `${documentMetadataGET.ID}answers`;
+        if (documentMetadataGET.generatingMode === "edit")
+            answersLSName = `${documentMetadataGET.ID}solutions`;
+        else
+            answersLSName = `${documentMetadataGET.ID}answers`;
         // Read previously saved answers if they exist:
         const localAnswers = localStorage.getItem(answersLSName);
         if (localAnswers !== null)
@@ -223,7 +238,7 @@ async function init(): Promise<void>
     };
 
     // Move the document content from the metadata into its separate object:
-    documentContent = JSON.parse(documentMetadata.documentJSON!);
+    documentContent = JSON.parse(documentMetadata.documentJSON ?? "[]");
     delete documentMetadata.documentJSON;
 
     if (documentMetadataGET.generatingMode === "edit") {
@@ -242,13 +257,43 @@ async function init(): Promise<void>
         }
 
         if (answers === null || answers.length === 0)
-            answers = JSON.parse(documentMetadata.solutionJSON!);
+            answers = JSON.parse(documentMetadata.solutionJSON ?? "[]");
     }
 
     if (documentMetadata.solutionJSON)
         solutions = JSON.parse(documentMetadata.solutionJSON);
-
-    generateDocument();
+    
+    const deleteBtn = document.getElementById("clear-answers") as HTMLInputElement;
+    const submitBtn = document.getElementById("submit-answers") as HTMLInputElement;
+    if (documentMetadata.generatingMode == "answer") {
+        deleteBtn.addEventListener("click", clearLS);
+        submitBtn.addEventListener("click", async () => {
+            await submitAnswers();
+            clearLS();
+            location.href = "/views/home.phtml";
+        });
+    }
+    else if (documentMetadata.generatingMode === "edit") {
+        deleteBtn.value = "Odbaci promjene";
+        deleteBtn.addEventListener("click", clearLS);
+        submitBtn.value = "Spremi promjene";
+        submitBtn.addEventListener("click", async() => {
+            await submitAnswers();
+            await updateDocument();
+            clearLS();
+            location.href = "/views/home.phtml";
+        });
+    }
+    else
+        document.getElementById("questions-box-buttons")?.remove();
+    
+    if (documentContent.length > 0)
+        generateDocument();
+    else {
+        const questionsBox
+            = document.getElementById("questions-box") as HTMLFormElement | null;
+        questionsBox?.appendChild(generateNewQuestionBtn());
+    }
 }
 
 window.addEventListener("load", init);

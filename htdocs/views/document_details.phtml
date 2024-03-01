@@ -33,9 +33,9 @@ echo "<li>Kreiran: {$document["creationDate"]}</li>",
     "<li>Vidljivost: {$document["visibility"]}</li>",
     "<li>Rok predaje: ", $document["deadlineDatetime"] ?? "nema", "</li>",
     "<li>Broj dozvoljenih pokušaja: $numSubmissionsLeft/{$document["numMaxSubmissions"]}</li>",
-    "<li>Broj pitanja: ", $document["numQuestions"] ?? 0, "</li>",
+    "<li>Broj pitanja: ", $document["numQuestions"] ?? 0, "</li>";
     // TODO: get sum in SQL query:
-    "<li>Broj bodova: ", array_sum(json_decode($document["points"])) ?? 0, "</li>";
+    // "<li>Broj bodova: ", array_sum(json_decode($document["points"])) ?? 0, "</li>";
 
 if (Document::isSubmittingAllowed($documentID))
     echo "<button onclick='location.href=\"/api/submission_process.php?documentID={$obfDocumentID}&start\"'>Riješi</button>";

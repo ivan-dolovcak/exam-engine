@@ -4,6 +4,15 @@ session_start();
 $documentID = Util::deobfuscateID($_GET["documentID"]);
 $submissionID = Submission::loadUnfinishedID($documentID);
 
+$answers = file_get_contents("php://input");
+
+if (isset($_GET["edit"])) {
+    $db = new DB();
+    echo $answers;
+    $db->execStmt("updateSolution", $answers, $documentID);
+    die;
+}
+
 if (isset($_GET["start"])) {
     if (! Document::isSubmittingAllowed($documentID))
         die("forbidden");
@@ -13,7 +22,6 @@ if (isset($_GET["start"])) {
     Util::redirect("/views/document.php?documentID={$_GET["documentID"]}&mode=answer");
 }
 
-$answers = file_get_contents("php://input");
 if (empty($answers))
     $answers = null;
 $db = new DB();

@@ -129,6 +129,22 @@ class DB
                 where `ID`= ?",
             "types" => "i"
         ],
+        "updateSolution" => [
+            "query" => "
+                update `Document`
+                set `solutionJSON` = ?
+                where `ID` = ?
+            ",
+            "types" => "si"
+        ],
+        "updateDocument" => [
+            "query" => "
+                update `Document`
+                set `documentJSON` = ?
+                where `ID` = ?
+            ",
+            "types" => "si"
+        ]
     ];
 
     public readonly mysqli $conn;
