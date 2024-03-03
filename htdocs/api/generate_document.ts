@@ -69,6 +69,7 @@ export function generateNewQuestionBtn(): HTMLDivElement
         option.addEventListener("click", () => {
             const questionElement = QuestionElement.generateEmpty(option.innerHTML);
             option.parentElement!.parentElement!.replaceWith(questionElement!);
+            documentContent.push(questionElement!.data);
             saveQuestion(questionElement!.data);
         });
     }
@@ -77,7 +78,7 @@ export function generateNewQuestionBtn(): HTMLDivElement
 }
 
 /** Dynamically generate all document elements. */
-function generateDocument(): void
+async function generateDocument()
 {
     // Apply the order of generated questions:
     documentContent = documentContent.sort(
@@ -111,12 +112,15 @@ function generateDocument(): void
                 questionData, answerData, gradeData);
 
         questionsBox?.appendChild(questionElement!);
+
+        // await new Promise(resolve => setTimeout(resolve, 70));
     }
 }
 
 /** Save user submission locally at all times. */
 export function saveAnswersLocal(): void
 {
+    console.log(JSON.stringify(answers));
     // Save only non-nullish values:
     const cleanAnswers: IAnswerData[]
         = answers.filter(answer => {
@@ -129,11 +133,13 @@ export function saveAnswersLocal(): void
     console.log("Saved document answers locally.");
 }
 
-function clearLS(): void
+async function clearLS()
 {
-    localStorage.removeItem(answersLSName);
-    localStorage.removeItem(contentLSName);
-    location.reload();
+    return Promise.resolve().then(() => {
+        localStorage.removeItem(answersLSName);
+        localStorage.removeItem(contentLSName);
+        location.reload();
+    });
 }
 
 async function updateDocument()
@@ -269,26 +275,28 @@ async function init(): Promise<void>
         deleteBtn.addEventListener("click", clearLS);
         submitBtn.addEventListener("click", async () => {
             await submitAnswers();
-            clearLS();
-            location.href = "/views/home.phtml";
+            await clearLS().then(() => {
+                location.href = "/views/home.phtml";
+            });
         });
     }
     else if (documentMetadata.generatingMode === "edit") {
         deleteBtn.value = "Odbaci promjene";
         deleteBtn.addEventListener("click", clearLS);
         submitBtn.value = "Spremi promjene";
-        submitBtn.addEventListener("click", async() => {
-            await submitAnswers();
-            await updateDocument();
-            clearLS();
-            location.href = "/views/home.phtml";
+        submitBtn.addEventListener("click", async () => {
+            await submitAnswers().then(updateDocument).then(clearLS)
+            .then(() => {
+                console.log(JSON.stringify(documentContent));
+                location.href = "/views/home.phtml";
+            });
         });
     }
     else
         document.getElementById("questions-box-buttons")?.remove();
     
     if (documentContent.length > 0)
-        generateDocument();
+        await generateDocument();
     else {
         const questionsBox
             = document.getElementById("questions-box") as HTMLFormElement | null;

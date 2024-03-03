@@ -208,7 +208,7 @@ export abstract class QuestionElement extends HTMLDivElement
 
     static generateEmpty(questionType: string): QuestionElement | undefined
     {
-        const ID = Math.random();
+        const ID: number = Math.floor(Math.random() * 10e9);
         const title = "[naslov pitanja]";
         const required = documentMetadata.type === "exam";
         let points = 1;
@@ -450,9 +450,10 @@ export class MultiChoice extends QuestionElement
     }
 
     showSolution(): void
-    {   
+    {
         for (const checkbox of this.inputsDiv.getElementsByTagName("input")) {
-            if (this.solution.value?.includes(checkbox.value))
+            if (this.solution.value?.includes(checkbox.value)
+                )
                 checkbox.parentElement?.classList.add("correct");
             else if (checkbox.checked)
                 checkbox.parentElement?.classList.add("incorrect");
@@ -580,7 +581,8 @@ export class FillIn extends QuestionElement
         const solutionDiv = document.createElement("div");
 
         for (let i = 0; i < this.solution.value!.length; ++i) {
-            if (this.solution.value![i] === this.answer.value![i])
+            if (this.answer.value
+                && this.solution.value![i] === this.answer.value![i])
                 inputs[i].style.color = "lime";
             else {
                 inputs[i].style.color = "red";
