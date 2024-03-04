@@ -1,6 +1,15 @@
 # Changelog
 
 
+# v0.5.0 (2024-03-04)
+
+- various code improvements
+- implemented review & grading front-end and back-end logic
+- implemented editing mode
+- fixed null errors
+- expanded database & implemented checks
+
+
 # v0.4.0 (2024-01-20)
 
 - add more CSS for form elements, header & nav
