@@ -31,7 +31,7 @@ class Document
 
     public static function isSubmittingAllowed(int $ID): bool
     {
-        $document = json_decode(self::load($ID));
+        $document = self::load($ID);
 
         if (isset($document->deadlineDatetime)
                 && time() > strtotime($document->deadlineDatetime))
@@ -47,15 +47,15 @@ class Document
         return true;
     }
 
-    public static function load(int $ID): string
+    public static function load(int $ID): object
     {
         $db = new DB();
 
         $db->execStmt("loadDocument", $ID);
         $sqlResult = $db->stmt->get_result();
-        $json = $sqlResult->fetch_assoc();
+        $document = $sqlResult->fetch_object();
 
-        return json_encode($json);
+        return $document;
     }
 
     public static function loadSolution(int $ID): object

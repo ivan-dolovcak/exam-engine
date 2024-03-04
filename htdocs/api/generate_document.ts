@@ -46,14 +46,15 @@ export let solutions: IAnswerData[] | null = [];
 async function fetchDocument(documentID: string): Promise<IDocumentData>
 {
     const response = await fetch(
-        `/views/document.php?documentID=${documentID}&loadDocument`);
+        `/api/fetch_document.php?documentID=${documentID}`);
     const json = await response.json();
     return json;
 }
 
-async function fetchSubmission(): Promise<ISubmissionData>
+async function fetchSubmission(submissionID: string): Promise<ISubmissionData>
 {
-    const response = await fetch(`${location.href}&loadSubmission`);
+    const response = await fetch(
+        `/api/fetch_document.php?submissionID=${submissionID}`);
     const json = await response.json();
     return json;
 }
@@ -120,7 +121,6 @@ async function generateDocument()
 /** Save user submission locally at all times. */
 export function saveAnswersLocal(): void
 {
-    console.log(JSON.stringify(answers));
     // Save only non-nullish values:
     const cleanAnswers: IAnswerData[]
         = answers.filter(answer => {
@@ -220,7 +220,7 @@ async function init(): Promise<void>
     // In case of review mode, fetch submission content and metadata and the
     // document ID of the submission.
     if (documentMetadataGET.generatingMode === "review") {
-        submission = await fetchSubmission();
+        submission = await fetchSubmission(documentMetadataGET.submissionID!);
         documentMetadataGET.ID = submission.documentID;
         
         answers = JSON.parse(submission.submissionJSON);

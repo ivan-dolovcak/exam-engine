@@ -62,7 +62,7 @@ class Submission
         $submission = json_decode(self::load($ID));
         $submission->documentID = Util::deobfuscateID($submission->documentID);
 
-        $document = json_decode(Document::load($submission->documentID));
+        $document = Document::load($submission->documentID);
         $questions = json_decode($document->documentJSON);
 
         $answers = json_decode($submission->submissionJSON);

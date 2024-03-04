@@ -1,36 +1,35 @@
 <?php
 session_start();
 
-if (isset($_GET["documentID"]))
-    $documentID = Util::deobfuscateID($_GET["documentID"]);
-else
-    $documentID = null;
-if (isset($documentID) && ! Document::isSubmittingAllowed($documentID)
-        && ($_GET["mode"] ?? null) === "answer")
-    die("forbidden");
-
-// For passing the document metadata to JS:
-if (isset($_GET["loadDocument"])) {
-    $documentJSON = Document::load($documentID);
-    echo $documentJSON;
-    die;
-}
-if (isset($_GET["loadSubmission"])) {
-    $submissionID = Util::deobfuscateID($_GET["submissionID"]);
-    $submissionJSON = Submission::load($submissionID);
-    echo $submissionJSON;
-    die;
-}
-
 // User has to be logged in to use this page. If not, redirect:
 if (! isset($_SESSION["userID"]))
     Util::redirect("/views/login.phtml");
 
-// if (! isset($_GET["documentID"]) || ! isset($_GET["mode"]))
-//     Util::redirect("/views/home.phtml");
+// Required mode and either submission or document ID.
+if (! (isset($_GET["mode"]) 
+        && (isset($_GET["documentID"]) || isset($_GET["submissionID"]))))
+    die("invalid GET request");
 
+// Valid generating mode.
 if (! in_array($_GET["mode"], ["answer", "edit", "review"], strict:true))
-    Util::redirect("/views/home.phtml");
+    die("invalid GET request");
+
+if (isset($_GET["documentID"])) {
+    $documentID = Util::deobfuscateID($_GET["documentID"]);
+
+    switch($_GET["mode"]) {
+    case "answer":
+        // Deny document viewing if submitting forbidden.
+        if (! Document::isSubmittingAllowed($documentID))
+            die("submitting forbidden");
+        break;
+    case "edit":
+        // Deny document editing if not author.
+        // if (! Document::isEditingAllowed($documentID))
+        //     die("editing forbidden");
+        break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="hr">
